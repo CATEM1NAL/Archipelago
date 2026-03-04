@@ -52,6 +52,6 @@ class PAYDAY2World(World):
             "final_difficulty",
         )
         args["server_version"] = self.world_version.as_simple_string()
-        args["seed_name"] = str(self.multiworld.seed_name)
+        args["seed_name"] = f"cd_{self.multiworld.seed_name}"
 
         return args
