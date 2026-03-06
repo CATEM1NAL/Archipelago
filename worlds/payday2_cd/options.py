@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 
-from Options import Choice, OptionGroup, PerGameCommonOptions, Range, Toggle, OptionSet
+from Options import Choice, OptionGroup, PerGameCommonOptions, Range, Toggle, OptionSet, DefaultOnToggle
+
 
 class ScoreLocations(Range):
     """
@@ -18,7 +19,7 @@ class StartingTime(Range):
     How many minutes you start with before time bonuses.
     """
 
-    display_name = "Starting Time"
+    display_name = "Starting Time (minutes)"
 
     range_start = 1
     range_end = 100
@@ -166,8 +167,9 @@ class ArmorCount(Range):
 
 class DeployablesCount(Range):
     """
-    How many unimportant deployables are guaranteed to generate in the multiworld.
+    How many non-progression deployables are guaranteed to generate in the multiworld.
     Additional deployables may be created randomly.
+    This item also gives a deployable upgrade when collected that gets rerolled at the start of every run.
     ECMs and trip mines will always generate somewhere in the multiworld.
     """
 
@@ -186,15 +188,12 @@ class MinDiff(Choice):
 
     display_name = "Starting Difficulty"
 
-    option_normal = 0
-    option_hard = 1
-    option_very_hard = 2
-    option_overkill = 3
-    option_mayhem = 4
-    option_death_wish = 5
-    option_death_sentence = 6
+    option_normal = 1
+    option_hard = 2
+    option_very_hard = 3
+    option_overkill = 4
 
-    default = 0
+    default = 1
 
 class MaxDiff(Choice):
     """
@@ -205,9 +204,6 @@ class MaxDiff(Choice):
 
     display_name = "Final Difficulty"
 
-    option_normal = 1
-    option_hard = 2
-    option_very_hard = 3
     option_overkill = 4
     option_mayhem = 5
     option_death_wish = 6
@@ -215,20 +211,7 @@ class MaxDiff(Choice):
 
     default = 6
 
-class OneDown(Choice):
-    """
-    When One Down is active all points earned are doubled.
-    """
-
-    display_name = "One Down"
-
-    option_disabled = 0
-    option_in_item_pool = 1
-    option_enabled = 2
-
-    default = 1
-
-class DiffTraps(Choice):
+class DiffTraps(DefaultOnToggle):
     """
     Difficulty traps permanently increase the difficulty by 1 per trap collected,
     but also grant a score multiplier.
@@ -236,10 +219,6 @@ class DiffTraps(Choice):
     """
 
     display_name = "Difficulty Traps"
-
-    option_disabled = 0
-    option_enabled = 1
-    default = 1
 
 class MutatorTraps(Range):
     """
@@ -252,6 +231,15 @@ class MutatorTraps(Range):
     range_start = 0
     range_end = 5
     default = 5
+
+class DeathLink(Toggle):
+    """
+    Death links are sent every time a heist is failed.
+    After receiving a death link you will lose a down the next time you take damage.
+    In a multiplayer session only the lobby host can send death links to avoid spam.
+    """
+
+    display_name = "Death Link"
 
 # We must now define a dataclass inheriting from PerGameCommonOptions that we put all our options in.
 # This is in the format "option_name_in_snake_case: OptionClassName".
@@ -272,6 +260,6 @@ class PAYDAY2Options(PerGameCommonOptions):
     throwables: ThrowableCount
     starting_difficulty: MinDiff
     final_difficulty: MaxDiff
-    #one_down: OneDown
     difficulty_traps: DiffTraps
     mutator_traps: MutatorTraps
+    death_link: DeathLink

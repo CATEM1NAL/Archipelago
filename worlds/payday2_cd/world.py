@@ -50,6 +50,7 @@ class PAYDAY2World(World):
             "starting_time",
             "time_bonus",
             "final_difficulty",
+            "death_link"
         )
         args["server_version"] = self.world_version.as_simple_string()
         args["seed_name"] = f"cd_{self.multiworld.seed_name}"

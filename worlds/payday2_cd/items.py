@@ -35,7 +35,7 @@ usefulItemDict: dict[int, itemData] = {
     206: itemData(IC.useful, 7, "Deployable", itemType.unlock),
     207: itemData(IC.useful, 10, "Skill", itemType.filler),
     208: itemData(IC.useful, 9, "Perk", itemType.filler),
-    209: itemData(IC.filler, 20, "Stat Boost", itemType.filler),
+    209: itemData(IC.filler, 10, "Stat Boost", itemType.filler),
 }
 
 fillerItemDict: dict[int, itemData] = {
@@ -143,6 +143,6 @@ def create_all_items(world: PAYDAY2World) -> None:
 
     world.multiworld.itempool += itemPool
 
-    if world.options.starting_difficulty > 0:
+    if world.options.starting_difficulty > 1:
         for i in range(world.options.starting_difficulty):
-            world.push_precollected("Difficulty Increase")
+            world.push_precollected(world.create_item("Difficulty Increase"))

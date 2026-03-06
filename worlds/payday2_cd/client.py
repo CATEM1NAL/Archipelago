@@ -1,5 +1,5 @@
 from CommonClient import CommonContext, ClientCommandProcessor, server_loop, get_base_parser, handle_url_arg, logger
-import Utils, asyncio, colorama, logging, json, os, math, shutil
+import Utils, asyncio, colorama, logging, json, os, math, time, random
 from . import PAYDAY2World
 from . import items
 from .item_types import itemType, itemData
@@ -44,6 +44,12 @@ class scribble:
         self.data[key] = slotData
         with open(self.path, "w+") as f:
             json.dump(self.data, f)
+
+    def writeDeathTime(self):
+        self.data["deathlink"] = math.floor(time.time())
+        with open(self.path, "w+") as f:
+            json.dump(self.data, f)
+
 # scrungle likes to watch
 class scrungle:
     def __init__(self, path, context):
@@ -52,16 +58,21 @@ class scrungle:
 
     # function derived from Project Diva APWorld
     async def watch(self):
-        print(f"Scrungle is watching {self.path}...")
         modSave = load_json_file(self.path)
         prevScore = 0
-        chatMessage = ""
-        lastChatTime = 0
+        prevRun = -1
+        lastChatTime = None
         lastModTime = os.path.getmtime(self.path) if os.path.isfile(self.path) else 0.0
         lastModTime = 0
+        deathMsgs = ["left their favourite cassette in the escape car.",
+                     "got caught.",
+                     "learned that crime doesn't pay.",
+                     "watched dawn turn to dusk."]
 
-        try:
-            while True:
+        print(f"Scrungle is watching {self.path}...")
+
+        while True:
+            try:
                 if os.path.isfile(self.path):
                     modTime = os.path.getmtime(self.path)
 
@@ -71,6 +82,7 @@ class scrungle:
                         try:
                             modSave = load_json_file(self.path)
                             score = modSave["game"]["score"] / 100
+                            run = modSave["game"]["run"]
 
                             # Has the game been won?
                             try:
@@ -83,6 +95,15 @@ class scrungle:
                             if score > prevScore:
                                 await self.context.score_check(score)
                                 prevScore = score
+
+                            if prevRun == -1:
+                                prevRun = run
+
+                            # Send deathlink
+                            if prevRun < run:
+                                prevRun = run
+
+                                await self.context.send_death(f"{self.context.player_names[self.context.slot]} {random.choice(deathMsgs)}")
 
                         except (FileNotFoundError, json.decoder.JSONDecodeError) as e:
                             print(f"Couldn't load apyday2.txt: {e}")
@@ -98,19 +119,21 @@ class scrungle:
                             commandprocessor = self.context.command_processor(self.context)
                             chatMessage = modSave["chat"]["message"]
                             chatTimestamp = modSave["chat"]["timestamp"]
+                            if not lastChatTime:
+                                lastChatTime = chatTimestamp
 
                             if chatMessage != "" and chatTimestamp > lastChatTime:
                                 print("Sending chat message!")
                                 commandprocessor(chatMessage)
                                 lastChatTime = chatTimestamp
                         except Exception as e:
-                            print(f"Couldn't find apyday2.txt: {e}")
-
-
+                            print(f"Couldn't find apyday2: {e}")
                 await asyncio.sleep(1)
 
-        except asyncio.CancelledError:
-            print("Scrungle stopped watching. Scrungle bored.")
+            except asyncio.CancelledError:
+                print("Scrungle stopped watching. Scrungle bored.")
+            except Exception as e:
+                print(e)
 
 class PAYDAY2Context(CommonContext):
     game = "PAYDAY 2: Criminal Dawn"
@@ -121,6 +144,8 @@ class PAYDAY2Context(CommonContext):
         super().__init__(server_address, password)
         self.initialized = False
         self.score = 0
+        self.scrungle_task = None
+        self.deathLinkPending = False
 
     async def server_auth(self, password_requested: bool = False):
         if password_requested and not self.password:
@@ -133,6 +158,10 @@ class PAYDAY2Context(CommonContext):
             self.on_connected(args)
         elif cmd == "ReceivedItems":
             self.on_received_items(args)
+        elif cmd == "Bounced":
+            if "tags" in args:
+                if "DeathLink" in args["tags"]:
+                    self.on_deathlink(args["data"])
 
     def on_connected(self, args: dict):
         version = PAYDAY2World.world_version.as_simple_string()
@@ -183,8 +212,9 @@ class PAYDAY2Context(CommonContext):
         except:
             pass
 
-        self.scrungle = scrungle(self.path + "apyday2.txt", self)
-        scrungle_task = asyncio.create_task(self.scrungle.watch(), name='scrungle')
+        if not self.scrungle_task:
+            self.scrungle = scrungle(self.path + "apyday2.txt", self)
+            self.scrungle_task = asyncio.create_task(self.scrungle.watch(), name='scrungle')
 
         self.itemDict = items.itemDict
 
@@ -195,6 +225,10 @@ class PAYDAY2Context(CommonContext):
         self.scribble.writeSlotData(self.startingTime, "start_time")
         self.scribble.writeSlotData(self.timeBonus, "time_bonus")
         self.scribble.writeSlotData(self.finalDifficulty, "max_diff")
+
+        self.deathLinkEnabled = args['slot_data']["death_link"]
+        if self.deathLinkEnabled:
+            asyncio.create_task(self.update_death_link(True))
 
     def on_received_items(self, args: dict):
         # for entry in self.items_received:
@@ -261,6 +295,26 @@ class PAYDAY2Context(CommonContext):
 
         except KeyError as e:
             logger.error(e)
+
+    # Deathlink handlers
+    def on_deathlink(self, data: dict):
+        if self.deathLinkPending:
+            return
+        self.scribble.writeDeathTime()
+        super().on_deathlink(data)
+        asyncio.create_task(self.resetDeathLinkFlag())
+
+    async def send_death(self, death_text: str = ""):
+        if self.deathLinkPending:
+            return
+        if self.deathLinkEnabled:
+            self.deathLinkPending = True
+            asyncio.create_task(super().send_death(death_text))
+            asyncio.create_task(self.resetDeathLinkFlag())
+
+    async def resetDeathLinkFlag(self):
+        await asyncio.sleep(1)
+        self.deathLinkPending = False
 
     def run_gui(self):
         from kvui import GameManager
