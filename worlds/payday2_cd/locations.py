@@ -107,6 +107,9 @@ def create_score_locations(world: PAYDAY2World) -> None:
 
             #print(f"{location}: {timeBonuses}")
             #print(f"{location}: \n{timeBonuses}\n{diffTraps}\n{mutatorTraps}\n{bots}\n{i // (world.options.score_checks // 8)}")
+            diffTraps = 0
+            mutatorTraps = 0
+            bots = 0
             locationRule = HasAllCounts({"Time Bonus": timeBonuses,
                                          "Difficulty Increase": diffTraps,
                                          "Additional Mutator": mutatorTraps,
@@ -138,9 +141,7 @@ def create_score_locations(world: PAYDAY2World) -> None:
                                  "Additional Mutator": world.options.mutator_traps.value,
                                  "Extra Bot": world.options.bots.value,
                                  "Perma-Perk": 8})
-
     world.set_rule(location, locationRule)
-    #world.set_rule(location, Has("Time Bonus", itemsForGoal))
     region.locations.append(location)
     crimenet.connect(region, f"Final Heist")
 

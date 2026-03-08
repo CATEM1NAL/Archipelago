@@ -83,7 +83,7 @@ def update_items(world: PAYDAY2World) -> None:
     progressionItemDict[100] = itemData(IC.trap, world.options.difficulty_traps * (world.options.final_difficulty - 1), *itemDict[100][2:])
     progressionItemDict[101] = itemData(IC.trap, world.options.mutator_traps, *itemDict[101][2:])
     itemDict[100] = itemData(IC.progression | IC.trap, *itemDict[100][1:])
-    itemDict[101] = itemData(IC.progression | IC.trap, *itemDict[100][1:])
+    itemDict[101] = itemData(IC.progression | IC.trap, *itemDict[101][1:])
 
     optList = [world.options.primary_weapons, #200
                world.options.akimbo, #201
