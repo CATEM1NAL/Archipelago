@@ -71,8 +71,22 @@ def create_score_locations(world: PAYDAY2World) -> None:
         if i == 1:
             crimenet.connect(region, "Start run")
 
-        elif i > (world.options.score_checks / itemsForGoal):
-            world.set_rule(location, Has("Time Bonus", i // (world.options.score_checks // itemsForGoal)))
+        #elif (world.options.score_checks / itemsForGoal) < i:
+        #    timeBonuses = i // (world.options.score_checks // itemsForGoal)
+        #    world.set_rule(location, Has("Time Bonus", timeBonuses))
+        #    print(f"{location}: {timeBonuses}")
+
+        elif 1.5 * (world.options.score_checks / itemsForGoal) <= i < 4 * (world.options.score_checks / itemsForGoal):
+            timeBonuses = max(i // (world.options.score_checks // itemsForGoal) - 1, 1)
+            world.set_rule(location, Has("Time Bonus", timeBonuses))
+            print(f"{location}: {timeBonuses}")
+        elif 4 * (world.options.score_checks / itemsForGoal) <= i < world.options.score_checks:
+            timeBonuses = i * 2 // (world.options.score_checks // itemsForGoal) - 5
+            world.set_rule(location, Has("Time Bonus", timeBonuses))
+            print(f"{location}: {timeBonuses}")
+        elif i == world.options.score_checks:
+            world.set_rule(location, Has("Time Bonus", 5))
+            print(f"{location}: {5}")
 
         if world.options.difficulty_traps:
             diffTraps = i // (world.options.score_checks // (world.options.difficulty_traps * world.options.final_difficulty - 1))
@@ -83,6 +97,11 @@ def create_score_locations(world: PAYDAY2World) -> None:
             mutatorTraps = i // (world.options.score_checks // world.options.mutator_traps)
             world.set_rule(location, Has("Additional Mutator", mutatorTraps))
             #print(mutatorTraps)
+
+        if world.options.bots > 0:
+            bots = i // (world.options.score_checks // world.options.bots)
+            world.set_rule(location, Has("Extra Bot", bots))
+            #print(bots)
 
         if i > 1:
             prevRegion.connect(region, f"{i} points")
