@@ -128,7 +128,12 @@ def create_score_locations(world: PAYDAY2World) -> None:
     locName = "Final Heist Completed"
     region = Region(locName, world.player, world.multiworld)
     location = PAYDAY2Location(world.player, locName, None, region)
-    world.set_rule(location, Has("Time Bonus", itemsForGoal))
+    locationRule = HasAllCounts({"Time Bonus": itemsForGoal,
+                                 "Difficulty Increase": world.options.difficulty_traps * (world.options.final_difficulty - 1),
+                                 "Additional Mutator": world.options.mutator_traps.value,
+                                 "Extra Bot": world.options.bots.value,
+                                 "Perma-Perk": 8})
+    world.set_rule(location, locationRule)
     region.locations.append(location)
     crimenet.connect(region, f"Final Heist")
 
