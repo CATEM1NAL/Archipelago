@@ -27,6 +27,7 @@ class PAYDAY2World(World):
 
     location_name_to_id = locations.LOCATION_NAME_TO_ID
     item_name_to_id = items.ITEM_NAME_TO_ID
+    locationToScoreCap = []
 
     origin_region_name = "Crime.net"
 
@@ -54,5 +55,6 @@ class PAYDAY2World(World):
         )
         args["server_version"] = self.world_version.as_simple_string()
         args["seed_name"] = f"cd_{self.multiworld.seed_name}"
+        args["score_caps"] = self.locationToScoreCap
 
         return args

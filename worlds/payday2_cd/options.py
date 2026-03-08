@@ -29,7 +29,7 @@ class TimeUpgrades(Range):
     """
     Number of time bonuses the multiworld will try to generate.
     If the max time would be below 60 minutes or above 100 minutes this will be adjusted to fit.
-    The APWorld will assume you can win when you have at least 60 minutes available (~10 per heist).
+    The world will assume you can win when you have at least 60 minutes available (~10 per heist).
     """
 
     display_name = "Time Bonuses"

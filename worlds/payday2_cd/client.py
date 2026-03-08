@@ -45,8 +45,8 @@ class scribble:
         with open(self.path, "w+") as f:
             json.dump(self.data, f)
 
-    def writeDeathTime(self):
-        self.data["deathlink"] = math.floor(time.time())
+    def writeVariable(self, key, value):
+        self.data[key] = value
         with open(self.path, "w+") as f:
             json.dump(self.data, f)
 
@@ -146,6 +146,7 @@ class PAYDAY2Context(CommonContext):
         self.score = 0
         self.scrungle_task = None
         self.deathLinkPending = False
+        self.timeBonusReceived = 0
 
     async def server_auth(self, password_requested: bool = False):
         if password_requested and not self.password:
@@ -218,6 +219,7 @@ class PAYDAY2Context(CommonContext):
 
         self.itemDict = items.itemDict
 
+        self.scoreCaps = args['slot_data']["score_caps"]
         self.startingTime = args['slot_data']['starting_time']
         self.timeBonus = args['slot_data']['time_bonus']
         self.finalDifficulty = args['slot_data']['final_difficulty']
@@ -229,6 +231,8 @@ class PAYDAY2Context(CommonContext):
         self.deathLinkEnabled = args['slot_data']["death_link"]
         if self.deathLinkEnabled:
             asyncio.create_task(self.update_death_link(True))
+
+        self.scribble.run(self.scoreCaps[0])
 
     def on_received_items(self, args: dict):
         # for entry in self.items_received:
@@ -244,6 +248,10 @@ class PAYDAY2Context(CommonContext):
                 continue
 
             self.scribble.run(item.name)
+
+            if item.name == "Time Bonus":
+                self.timeBonusReceived += 1
+                self.scribble.writeVariable("scorecap", self.scoreCaps[self.timeBonusReceived])
 
     def getN(self, score):
         return math.floor((math.sqrt(1 + 8 * (score)) - 1) / 2)
@@ -300,7 +308,7 @@ class PAYDAY2Context(CommonContext):
     def on_deathlink(self, data: dict):
         if self.deathLinkPending:
             return
-        self.scribble.writeDeathTime()
+        self.scribble.writeVariable("deathlink", math.floor(time.time()))
         super().on_deathlink(data)
         asyncio.create_task(self.resetDeathLinkFlag())
 

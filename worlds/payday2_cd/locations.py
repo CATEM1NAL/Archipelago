@@ -58,6 +58,7 @@ def create_score_locations(world: PAYDAY2World) -> None:
 
     crimenet = world.get_region("Crime.net")
 
+    requiredTimeBonuses = {}
     for i in range(1, world.options.score_checks+1):
         locName = f"{triangle(i)} Crime Points"
         locId = world.location_name_to_id[locName]
@@ -79,14 +80,21 @@ def create_score_locations(world: PAYDAY2World) -> None:
         elif 1.5 * (world.options.score_checks / itemsForGoal) <= i < 4 * (world.options.score_checks / itemsForGoal):
             timeBonuses = max(i // (world.options.score_checks // itemsForGoal) - 1, 1)
             world.set_rule(location, Has("Time Bonus", timeBonuses))
-            print(f"{location}: {timeBonuses}")
+            #print(f"{location}: {timeBonuses}")
+            requiredTimeBonuses.update({triangle(i): timeBonuses})
+
         elif 4 * (world.options.score_checks / itemsForGoal) <= i < world.options.score_checks:
             timeBonuses = i * 2 // (world.options.score_checks // itemsForGoal) - 5
             world.set_rule(location, Has("Time Bonus", timeBonuses))
-            print(f"{location}: {timeBonuses}")
+            #print(f"{location}: {timeBonuses}")
+            requiredTimeBonuses.update({triangle(i): timeBonuses})
         elif i == world.options.score_checks:
             world.set_rule(location, Has("Time Bonus", 5))
-            print(f"{location}: {5}")
+            #print(f"{location}: {5}")
+            requiredTimeBonuses.update({triangle(i): 5})
+        else:
+            requiredTimeBonuses.update({triangle(i): 0})
+
 
         if world.options.difficulty_traps:
             diffTraps = i // (world.options.score_checks // (world.options.difficulty_traps * world.options.final_difficulty - 1))
@@ -106,6 +114,17 @@ def create_score_locations(world: PAYDAY2World) -> None:
         if i > 1:
             prevRegion.connect(region, f"{i} points")
         prevRegion = region
+
+    #print(requiredTimeBonuses)
+    required = 0
+    prevScore = 0
+    world.locationToScoreCap = []
+    for score, timeBonuses in requiredTimeBonuses.items():
+        if timeBonuses > required:
+            world.locationToScoreCap.append(prevScore)
+            required += 1
+        prevScore = score
+    #print(world.locationToScoreCap)
 
     locName = "Final Heist Completed"
     region = Region(locName, world.player, world.multiworld)
