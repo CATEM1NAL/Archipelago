@@ -106,14 +106,14 @@ class scrungle:
                                 await self.context.send_death(f"{self.context.player_names[self.context.slot]} {random.choice(deathMsgs)}")
 
                         except (FileNotFoundError, json.decoder.JSONDecodeError) as e:
-                            print(f"Couldn't load apyday2.txt: {e}")
+                            print(f"Couldn't load crimdawn_save.txt: {e}")
 
                         try:
                             safehouseDict = modSave["safehouse"]
                             if safehouseDict != []:
                                 await self.context.safehouse_check(safehouseDict)
                         except Exception as e:
-                            print(f"Couldn't find apyday2.txt: {e}")
+                            print(f"Couldn't find crimdawn_save.txt: {e}")
 
                         try:
                             commandprocessor = self.context.command_processor(self.context)
@@ -127,7 +127,7 @@ class scrungle:
                                 commandprocessor(chatMessage)
                                 lastChatTime = chatTimestamp
                         except Exception as e:
-                            print(f"Couldn't find apyday2: {e}")
+                            print(f"Couldn't find crimdawn_save.txt: {e}")
                 await asyncio.sleep(1)
 
             except asyncio.CancelledError:
@@ -172,7 +172,7 @@ class PAYDAY2Context(CommonContext):
             logger.info(f"WARNING: Server ({args['slot_data']['server_version']}) and client ({version}) are using different versions of the APWorld!")
 
         self.path = os.path.dirname(PAYDAY2World.settings.payday2_path) + "/mods/saves/"
-        self.scribble = scribble(self.path + "apyday2-client.txt")
+        self.scribble = scribble(self.path + "crimdawn_client.txt")
 
         if not os.path.isfile(PAYDAY2World.settings.payday2_path):
             logger.error('ERROR: Scrungle no find payday2_win32_release.exe.\nScrungle kindly requests that you remove payday2_path from host.yaml')
@@ -187,7 +187,7 @@ class PAYDAY2Context(CommonContext):
         print(f"Wrote seed to client file")
 
         try:
-            modSave = load_json_file(self.path + "apyday2.txt")
+            modSave = load_json_file(self.path + "crimdawn_save.txt")
 
             try:
                 modSeed = modSave["game"]["seed"]
@@ -195,7 +195,7 @@ class PAYDAY2Context(CommonContext):
                 modSeed = ""
 
         except (FileNotFoundError, json.decoder.JSONDecodeError) as e:
-            print(f"Couldn't load apyday2.txt: {e}")
+            print(f"Couldn't load crimdawn_save.txt: {e}")
 
         try:
             if modSeed != args['slot_data']['seed_name'] and modSeed != "":
@@ -214,7 +214,7 @@ class PAYDAY2Context(CommonContext):
             pass
 
         if not self.scrungle_task:
-            self.scrungle = scrungle(self.path + "apyday2.txt", self)
+            self.scrungle = scrungle(self.path + "crimdawn_save.txt", self)
             self.scrungle_task = asyncio.create_task(self.scrungle.watch(), name='scrungle')
 
         self.itemDict = items.itemDict
