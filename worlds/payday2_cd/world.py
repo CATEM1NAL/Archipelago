@@ -40,15 +40,18 @@ class PAYDAY2World(World):
     def generate_early(self) -> None:
         if self.options.progression_pacing == "quick":
             self.timeBonusStrength = 20
-            self.maxTimeBonuses = World.random.randint(4, 5)
+            self.maxTimeBonuses = self.random.randint(4, 5)
 
         elif self.options.progression_pacing == "standard":
             self.timeBonusStrength = 10
-            self.maxTimeBonuses = World.random.randint(7, 9)
+            self.maxTimeBonuses = self.random.randint(7, 9)
 
         elif self.options.progression_pacing == "glacial":
             self.timeBonusStrength = 5
-            self.maxTimeBonuses = World.random.randint(15, 19)
+            self.maxTimeBonuses = self.random.randint(15, 19)
+
+        if self.options.biglobby == 0: self.botCount = 3
+        else: self.botCount = self.random.randint(4,21)
 
     def create_regions(self) -> None:
         locations.create_and_connect_regions(self)
@@ -67,11 +70,10 @@ class PAYDAY2World(World):
 
     def fill_slot_data(self) -> Mapping[str, Any]:
         args = self.options.as_dict(
-            "starting_time",
-            "time_bonus",
             "final_difficulty",
             "death_link"
         )
+        args["timer_strength"] = self.timeBonusStrength
         args["server_version"] = self.world_version.as_simple_string()
         args["seed_name"] = f"cd_{self.multiworld.seed_name}"
         args["score_caps"] = self.locationToScoreCap

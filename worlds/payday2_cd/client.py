@@ -192,13 +192,13 @@ class PAYDAY2Context(CommonContext):
             try:
                 modSeed = modSave["game"]["seed"]
             except (KeyError):
-                modSeed = ""
+                modSeed = False
 
         except (FileNotFoundError, json.decoder.JSONDecodeError) as e:
             print(f"Couldn't load crimdawn_save.txt: {e}")
 
         try:
-            if modSeed != args['slot_data']['seed_name'] and modSeed != "":
+            if modSeed != args['slot_data']['seed_name'] and modSeed != False:
                 logger.error("ERROR: Your Criminal Dawn save was made on a different seed.\n"
                              "Only one multiworld can currently be played at a time.\n\n"
                              "Delete your save with the following steps:\n"
@@ -220,12 +220,10 @@ class PAYDAY2Context(CommonContext):
         self.itemDict = items.itemDict
 
         self.scoreCaps = args['slot_data']["score_caps"]
-        self.startingTime = args['slot_data']['starting_time']
-        self.timeBonus = args['slot_data']['time_bonus']
+        self.timerStrength = args['slot_data']['timer_strength']
         self.finalDifficulty = args['slot_data']['final_difficulty']
 
-        self.scribble.writeSlotData(self.startingTime, "start_time")
-        self.scribble.writeSlotData(self.timeBonus, "time_bonus")
+        self.scribble.writeSlotData(self.timerStrength, "timer_strength")
         self.scribble.writeSlotData(self.finalDifficulty, "max_diff")
 
         self.deathLinkEnabled = args['slot_data']["death_link"]

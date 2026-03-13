@@ -34,7 +34,7 @@ def create_and_connect_regions(world: PAYDAY2World) -> None:
     crimenet = world.get_region("Crime.net")
     safehouseT2 = world.get_region("Safe House Tier 2")
     safehouseT3 = world.get_region("Safe House Tier 3")
-    itemsForGoal = (60 - world.options.starting_time) / world.options.time_bonus
+    itemsForGoal = (60 - world.timeBonusStrength) / world.timeBonusStrength
 
     world.create_entrance(crimenet, safehouseT2, HasAllCounts({"24 Coins": 12, "Time Bonus": itemsForGoal // 3}), "276 Coins")
     world.create_entrance(crimenet, safehouseT3, HasAllCounts({"24 Coins": 35, "Time Bonus": 2 * itemsForGoal // 3}), "828 Coins")
@@ -45,7 +45,8 @@ def create_all_locations(world: PAYDAY2World) -> None:
 def create_score_locations(world: PAYDAY2World) -> None:
     # Create regions, assign a location to each region, chain entrances together
 
-    itemsForGoal = (60 - world.timeBonusStrength) / world.maxTimeBonuses
+    itemsForGoal = (60 - world.timeBonusStrength) / world.timeBonusStrength
+
 
     for i in range(2,4):
         safehouse = world.get_region(f"Safe House Tier {i}")
@@ -70,24 +71,12 @@ def create_score_locations(world: PAYDAY2World) -> None:
         location = PAYDAY2Location(world.player, locName, locId, region)
         region.locations.append(location)
 
-        timeBonuses = 0
-        diffTraps = 0
-        mutatorTraps = 0
-        bots = 0
-
-        if world.options.difficulty_traps:
-            diffTraps = i // (world.options.score_checks // (world.options.difficulty_traps * world.options.final_difficulty - 1))
-        if world.options.mutator_traps > 0:
-            mutatorTraps = i // (world.options.score_checks // world.options.mutator_traps)
-        bots = i // (world.options.score_checks // world.options.biglobby)
+        diffTraps = i // (world.options.score_checks // (world.options.final_difficulty - 1))
+        mutatorTraps = i // (world.options.score_checks // 5)
+        bots = i // (world.options.score_checks // world.botCount)
 
         if i == 1:
             crimenet.connect(region, "Start run")
-
-        #elif (world.options.score_checks / itemsForGoal) < i:
-        #    timeBonuses = i // (world.options.score_checks // itemsForGoal)
-        #    world.set_rule(location, Has("Time Bonus", timeBonuses))
-        #    print(f"{location}: {timeBonuses}")
 
         else:
             if 1.5 * (world.options.score_checks / itemsForGoal) <= i < 4 * (world.options.score_checks / itemsForGoal):
@@ -106,9 +95,6 @@ def create_score_locations(world: PAYDAY2World) -> None:
                 timeBonuses = 0
                 requiredTimeBonuses.update({triangle(i): 0})
 
-            #print(f"{location}: {timeBonuses}")
-            #print(f"{location}: \n{timeBonuses}\n{diffTraps}\n{mutatorTraps}\n{bots}\n{i // (world.options.score_checks // 8)}")
-
             locationRule = HasAllCounts({"Time Bonus": timeBonuses,
                                          "Difficulty Increase": diffTraps,
                                          "Additional Mutator": mutatorTraps,
@@ -122,7 +108,6 @@ def create_score_locations(world: PAYDAY2World) -> None:
             prevRegion.connect(region, f"{i} points")
         prevRegion = region
 
-    #print(requiredTimeBonuses)
     required = 0
     prevScore = 0
     world.locationToScoreCap = []
@@ -137,9 +122,9 @@ def create_score_locations(world: PAYDAY2World) -> None:
     region = Region(locName, world.player, world.multiworld)
     location = PAYDAY2Location(world.player, locName, None, region)
     locationRule = HasAllCounts({"Time Bonus": itemsForGoal,
-                                 "Difficulty Increase": world.options.difficulty_traps * (world.options.final_difficulty - 1),
-                                 "Additional Mutator": world.options.mutator_traps.value,
-                                 "Extra Bot": world.options.biglobby.value,
+                                 "Difficulty Increase": world.options.final_difficulty - 1,
+                                 "Additional Mutator": 5,
+                                 "Extra Bot": world.botCount,
                                  "Perma-Perk": 8,
                                  "Perma-Skill": 8})
 
