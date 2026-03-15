@@ -55,8 +55,7 @@ class scrungle:
     async def watch(self):
         modSave = load_json_file(self.path)
         prevScore = 0
-        prevHeistsWon = 1
-        prevHostHeistsWon = 1
+        prevHeistsWon = 0
         prevRun = -1
         lastChatTime = None
         lastModTime = os.path.getmtime(self.path) if os.path.isfile(self.path) else 0.0
@@ -84,14 +83,7 @@ class scrungle:
                             modSave = load_json_file(self.path)
                             score = modSave["game"]["score"]
                             run = modSave["game"]["run"]
-                            heistsWon = len(modSave["game"]["heists"])
-                            hostHeistsWon = modSave["game"]["host_heists"]
-
-                            # Has the game been won?
-                            try:
-                                modSave["game"]["victory"]
-                                await self.send_msgs([{"cmd": "StatusUpdate", "status": ClientStatus.CLIENT_GOAL}])
-                            except: pass
+                            heistsWon = modSave["game"]["heists_won"]
 
                             # Not in the except so people that play without autorelease can continue getting checks
                             if score > prevScore:
@@ -99,18 +91,13 @@ class scrungle:
                                 prevScore = score
 
                             if heistsWon > prevHeistsWon:
-                                for i in range (1, heistsWon):
-                                    print(f"Heist {i} Completed (host)")
+                                for i in range (1, heistsWon + 1):
+                                    print(f"Heist {i} Completed")
                                     heist = LOCATION_NAME_TO_ID[f"Heist {i} Completed"]
                                     await self.context.check_locations([heist])
+                                if heistsWon > 5:
+                                    await self.context.send_msgs([{"cmd": "StatusUpdate", "status": ClientStatus.CLIENT_GOAL}])
                                 prevHeistsWon = heistsWon
-
-                            if hostHeistsWon > prevHeistsWon:
-                                for i in range(1, hostHeistsWon):
-                                    print(f"Heist {i} Completed (peer)")
-                                    heist = LOCATION_NAME_TO_ID[f"Heist {i} Completed"]
-                                    await self.context.check_locations([heist])
-                                prevHeistsWon = hostHeistsWon
 
                             if prevRun == -1: prevRun = run
                             # Send deathlink
