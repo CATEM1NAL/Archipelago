@@ -1,48 +1,45 @@
 from __future__ import annotations
-
 from typing import TYPE_CHECKING
 
 import math
 from BaseClasses import Item, ItemClassification as IC
-from .item_types import itemData, itemType
+from .item_types import itemData
 
 if TYPE_CHECKING:
     from .world import CrimDawnWorld
 
 progressionItemDict: dict[int, itemData] = {
-    1: itemData(IC.progression | IC.useful, 0, "Time Bonus", itemType.progression),
-    2: itemData(IC.progression, 2, "Drill Sawgeant", itemType.progression),
-    3: itemData(IC.progression, 3, "Extra Bot", itemType.progression),
-    4: itemData(IC.progression, 2, "Nine Lives", itemType.progression),
-    5: itemData(IC.progression, 7, "Perma-Perk", itemType.progression),
-    6: itemData(IC.progression, 7, "Perma-Skill", itemType.progression)
+    1: itemData(IC.progression | IC.useful, 0, "Time Bonus"),
+    2: itemData(IC.progression, 2, "Drill Sawgeant"),
+    3: itemData(IC.progression, 3, "Extra Bot"),
+    4: itemData(IC.progression, 2, "Nine Lives"),
+    5: itemData(IC.progression, 7, "Perma-Perk"),
+    6: itemData(IC.progression, 7, "Perma-Skill")
 }
 
 trapItemDict: dict[int, itemData] = {
 }
 
 usefulItemDict: dict[int, itemData] = {
-    200: itemData(IC.useful, 38, "24 Coins", itemType.progression),
-    201: itemData(IC.useful, 2, "OVE9000 Saw", itemType.unlock),
-    202: itemData(IC.useful, 1, "ECM", itemType.unlock),
-    203: itemData(IC.useful, 1, "Trip Mines", itemType.unlock),
-    204: itemData(IC.useful, 13, "Skill", itemType.filler),
-    205: itemData(IC.useful, 13, "Perk", itemType.filler),
+    200: itemData(IC.useful, 40, "24 Coins"),
+    201: itemData(IC.useful, 2, "OVE9000 Saw"),
+    202: itemData(IC.useful, 13, "Skill"),
+    203: itemData(IC.useful, 13, "Perk"),
 }
 
 fillerItemDict: dict[int, itemData] = {
-    300: itemData(IC.filler, 18, "Primary Weapon", itemType.weapon),
-    301: itemData(IC.filler, 41, "Akimbo", itemType.weapon),
-    302: itemData(IC.filler, 23, "Secondary Weapon", itemType.weapon),
-    303: itemData(IC.filler, 18, "Melee Weapon", itemType.weapon),
-    304: itemData(IC.filler, 5, "Throwable", itemType.weapon),
-    305: itemData(IC.filler, 6, "Armor", itemType.unlock),
-    306: itemData(IC.filler, 7, "Deployable", itemType.unlock),
-    307: itemData(IC.filler, 10, "Stat Boost", itemType.filler)
+    300: itemData(IC.filler, 18, "Primary Weapon"),
+    301: itemData(IC.filler, 41, "Akimbo"),
+    302: itemData(IC.filler, 23, "Secondary Weapon"),
+    303: itemData(IC.filler, 18, "Melee Weapon"),
+    304: itemData(IC.filler, 5, "Throwable"),
+    305: itemData(IC.filler, 6, "Armor"),
+    306: itemData(IC.filler, 9, "Deployable"),
+    307: itemData(IC.filler, 13, "Stat Boost")
 }
 
 infFillerItemDict: dict[int, itemData] = {
-    400: itemData(IC.filler, 0, "6 Coins", itemType.filler)
+    400: itemData(IC.filler, 0, "6 Coins")
 }
 
 fillerLimitDict: dict[int, int] = {
@@ -53,7 +50,7 @@ fillerLimitDict: dict[int, int] = {
     304: 5,
     305: 6,
     306: 7,
-    307: 100
+    307: 52
 }
 
 itemDict: dict[int, itemData] = {}
@@ -71,7 +68,7 @@ class CrimDawnItem(Item):
 
 def update_items(world: CrimDawnWorld) -> None:
     progressionItemDict[1] = itemData(itemDict[1][0], world.maxTimeBonuses, *itemDict[1][2:])
-    print(f"{world.player_name} has {world.maxTimeBonuses} Time Bonus items.")
+    world.logger.info(f"{world.player_name} has {world.maxTimeBonuses} Time Bonuses.")
     progressionItemDict[3] = itemData(itemDict[3][0], world.botCount, *itemDict[3][2:])
     progressionItemDict[4] = itemData(itemDict[4][0], world.options.saws, *itemDict[4][2:])
 
@@ -111,6 +108,23 @@ def create_all_items(world: CrimDawnWorld) -> None:
     for itemId, item in usefulItemDict.items():
         for i in range(item.count):
             itemPool.append(world.create_item(item.name))
+
+    #Make sure filler doesn't go over number of locations
+    maxItemCount = 0
+    for itemId, item in fillerItemDict.items():
+        maxItemCount += item.count
+
+    while maxItemCount + len(itemPool) > len(world.multiworld.get_unfilled_locations(world.player)):
+        breakCounter = 0
+        for itemId, item in fillerItemDict.items():
+            if item.count > 7:
+                fillerItemDict[itemId] = itemData(itemDict[itemId][0], item.count - 1, *itemDict[itemId][2:])
+                maxItemCount -= 1
+            else:
+                breakCounter += 1
+        if breakCounter == 8:
+            world.logger.warning(f"WARNING: {world.player_name} attempted generation of too many items!")
+            break
 
     for itemId, item in fillerItemDict.items():
         for i in range(item.count):
