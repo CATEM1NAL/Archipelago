@@ -58,9 +58,9 @@ class ScoreLocations(Range):
 
     display_name = "Score Checks"
 
-    range_start = 122
-    range_end = 366
-    default = 122
+    range_start = 120
+    range_end = 368
+    default = 120
 
 class BotCount(Toggle):
     """
