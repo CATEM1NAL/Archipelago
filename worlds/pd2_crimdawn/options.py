@@ -213,7 +213,12 @@ class CrimDawnOptions(PerGameCommonOptions):
 option_groups = [
     OptionGroup(
         "Item Generation",
-        [BotCount, AdditionalSaw, PrimaryCount, AkimboCount,
-         SecondaryCount, MeleeCount, ThrowableCount],
+        [AdditionalSaw,
+         PrimaryCount,
+         AkimboCount,
+         SecondaryCount,
+         MeleeCount,
+         ThrowableCount,
+         BotCount],
     ),
 ]
