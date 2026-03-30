@@ -21,7 +21,7 @@ trapItemDict: dict[int, itemData] = {
 }
 
 usefulItemDict: dict[int, itemData] = {
-    200: itemData(IC.useful, 58, "24 Coins"),
+    200: itemData(IC.progression, 58, "24 Coins"),
     201: itemData(IC.useful, 2, "OVE9000 Saw"),
     202: itemData(IC.useful, 13, "Skill"),
     203: itemData(IC.useful, 13, "Perk"),
