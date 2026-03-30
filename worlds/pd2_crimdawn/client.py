@@ -247,13 +247,13 @@ class CrimDawnContext(CommonContext):
             self.scribble.run(item.name)
 
             if item.name == "Time Bonus":
-                print(f"{self.timeBonusReceived}: {self.scoreCaps}")
+                #print(f"{self.timeBonusReceived}: {self.scoreCaps}")
                 self.timeBonusReceived += 1
                 if self.timeBonusReceived < len(self.scoreCaps):
                     self.scribble.writeVariable("score_cap", self.scoreCaps[self.timeBonusReceived])
                     logger.info(f"Score cap increased to {self.scoreCaps[self.timeBonusReceived]}!")
                 else:
-                    self.scribble.writeVariable("score_cap", 5050)
+                    self.scribble.writeVariable("score_cap", self.scoreCaps[-1])
 
     def getN(self, score):
         return math.floor((math.sqrt(1 + 8 * (score)) - 1) / 2)

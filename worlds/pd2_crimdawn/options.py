@@ -11,7 +11,7 @@ class GamePace(Choice):
     With default settings this can take around ?? hours to goal.
 
     STANDARD: Start with 10 minutes, gain 10 with each time bonus.
-    With default settings this can take around 16 hours to goal.
+    With default settings this can take around 12 hours to goal.
 
     GLACIAL: Start with 5 minutes, gain 5 with each time bonus. Typically leads to more spheres.
     Increasing the number of score checks to at least 150 is recommended!
@@ -59,7 +59,7 @@ class ScoreLocations(Range):
     display_name = "Score Checks"
 
     range_start = 120
-    range_end = 368
+    range_end = 386
     default = 120
 
 class BotCount(Toggle):
