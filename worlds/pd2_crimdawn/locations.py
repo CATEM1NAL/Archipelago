@@ -147,7 +147,7 @@ def create_score_locations(world: CrimDawnWorld) -> None:
     #print(world.locationToScoreCap)
 
     location = world.get_location(f"Heist {world.options.run_length.value} Completed")
-    locationRule = HasAllCounts({"Time Bonus": world.itemsForGoal,
+    locationRule = HasAllCounts({"Time Bonus": int(world.itemsForGoal),
                                  "Extra Bot": world.botCount,
                                  "Perma-Perk": 7,
                                  "Perma-Skill": 7})
