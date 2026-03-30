@@ -46,6 +46,7 @@ fillerLimitDict: dict[int, int] = {
     304: 5,
     305: 6,
     306: 7,
+    307: 0,
 }
 
 itemDict: dict[int, itemData] = {}
@@ -83,7 +84,7 @@ def get_random_filler_item_name(world: CrimDawnWorld) -> str:
 
     itemId = ITEM_NAME_TO_ID[item.name]
 
-    if fillerLimitDict[itemId] > 0 and itemId != 307: fillerLimitDict[itemId] -= 1
+    if fillerLimitDict[itemId] > 0: fillerLimitDict[itemId] -= 1
     else: item = fillerItemDict[307]
 
     return item.name
