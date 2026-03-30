@@ -78,21 +78,7 @@ class AdditionalSaw(Range):
     The first saw will randomly be a primary or secondary.
     """
 
-    display_name = "Saws"
-
-    range_start = 0
-    range_end = 2
-
-    default = 2
-
-class NineLives(Range):
-    """
-    How many Nine Lives upgrades are available.
-    Nine Lives Lv1: 2 total downs.
-    Nine Lives Lv2: 4 total downs.
-    """
-
-    display_name = "Nine Lives"
+    display_name = "OVE9000 Saws"
 
     range_start = 0
     range_end = 2
@@ -200,15 +186,15 @@ class CrimDawnOptions(PerGameCommonOptions):
     run_length: RunLength
     infinite_time: InfiniteTime
     score_checks: ScoreLocations
-    biglobby: BotCount
+    final_difficulty: MaxDiff
+    death_link: DeathLink
     saws: AdditionalSaw
     primary_weapons: PrimaryCount
     akimbo: AkimboCount
     secondary_weapons: SecondaryCount
     melee_weapons: MeleeCount
     throwables: ThrowableCount
-    final_difficulty: MaxDiff
-    death_link: DeathLink
+    biglobby: BotCount
 
 option_groups = [
     OptionGroup(

@@ -21,7 +21,7 @@ trapItemDict: dict[int, itemData] = {
 }
 
 usefulItemDict: dict[int, itemData] = {
-    200: itemData(IC.useful, 40, "24 Coins"),
+    200: itemData(IC.useful, 58, "24 Coins"),
     201: itemData(IC.useful, 2, "OVE9000 Saw"),
     202: itemData(IC.useful, 13, "Skill"),
     203: itemData(IC.useful, 13, "Perk"),
@@ -38,10 +38,6 @@ fillerItemDict: dict[int, itemData] = {
     307: itemData(IC.filler, 13, "Stat Boost")
 }
 
-infFillerItemDict: dict[int, itemData] = {
-    400: itemData(IC.filler, 0, "6 Coins")
-}
-
 fillerLimitDict: dict[int, int] = {
     300: 18,
     301: 41,
@@ -50,7 +46,6 @@ fillerLimitDict: dict[int, int] = {
     304: 5,
     305: 6,
     306: 7,
-    307: 52
 }
 
 itemDict: dict[int, itemData] = {}
@@ -58,7 +53,6 @@ itemDict.update(progressionItemDict)
 itemDict.update(trapItemDict)
 itemDict.update(usefulItemDict)
 itemDict.update(fillerItemDict)
-itemDict.update(infFillerItemDict)
 
 ITEM_NAME_TO_ID = {item.name: key for key, item in itemDict.items()}
 itemKeys = []
@@ -89,8 +83,8 @@ def get_random_filler_item_name(world: CrimDawnWorld) -> str:
 
     itemId = ITEM_NAME_TO_ID[item.name]
 
-    if fillerLimitDict[itemId] > 0: fillerLimitDict[itemId] -= 1
-    else: item = world.random.choice(tuple(infFillerItemDict.values()))
+    if fillerLimitDict[itemId] > 0 and itemId != 307: fillerLimitDict[itemId] -= 1
+    else: item = fillerItemDict[307]
 
     return item.name
 

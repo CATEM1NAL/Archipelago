@@ -1,5 +1,5 @@
 from __future__ import annotations
-from rule_builder.rules import Has, HasAllCounts
+from rule_builder.rules import Has, HasAllCounts, CanReachLocation
 from worlds.generic.Rules import forbid_item
 
 from typing import TYPE_CHECKING
@@ -22,21 +22,19 @@ safehouseRooms = ["Scarface's Room", "Dallas' Office", "Hoxton's Files", "Clover
                "Sangres' Cave", "Chains' Weapons Workshop", "Bodhi's Surfboard Workshop", "Jacket's Hangout",
                  "Sokol's Hockey Gym", "Dragan's Gym", "Vault", "Wolf's Workshop", "Wick's Shooting Range"]
 
-LOCATION_NAME_TO_ID.update({f"{room} - Tier 2": key + maxScoreLocations for key, room in enumerate(safehouseRooms)})
-LOCATION_NAME_TO_ID.update({f"{room} - Tier 3": key + maxScoreLocations + len(safehouseRooms) for key, room in enumerate(safehouseRooms)})
-LOCATION_NAME_TO_ID.update({f"Heist {i} Completed": i + maxScoreLocations + 2 * len(safehouseRooms) for i in range(1, 7)})
+LOCATION_NAME_TO_ID.update({f"{room} (Tier 2)": key + maxScoreLocations for key, room in enumerate(safehouseRooms)})
+LOCATION_NAME_TO_ID.update({f"{room} (Tier 3)": key + maxScoreLocations + len(safehouseRooms) for key, room in enumerate(safehouseRooms)})
+LOCATION_NAME_TO_ID.update({f"{room} (Tier 4)": key + maxScoreLocations + (len(safehouseRooms) * 2) for key, room in enumerate(safehouseRooms)})
+LOCATION_NAME_TO_ID.update({f"{room} (Tier 5)": key + maxScoreLocations + (len(safehouseRooms) * 3) for key, room in enumerate(safehouseRooms)})
+LOCATION_NAME_TO_ID.update({f"{room} (Tier 6)": key + maxScoreLocations + (len(safehouseRooms) * 4) for key, room in enumerate(safehouseRooms)})
+LOCATION_NAME_TO_ID.update({f"Heist {i} Completed": i + maxScoreLocations + (len(safehouseRooms) * 5) for i in range(1, 7)})
 
 class CrimDawnLocation(Location):
     game = "PAYDAY 2: Criminal Dawn"
 
 def create_and_connect_regions(world: CrimDawnWorld) -> None:
     world.multiworld.regions.append(Region("Crime.net", world.player, world.multiworld))
-    world.multiworld.regions.append(Region("Safe House Tier 2", world.player, world.multiworld))
-    world.multiworld.regions.append(Region("Safe House Tier 3", world.player, world.multiworld))
-
     crimenet = world.get_region("Crime.net")
-    safehouseT2 = world.get_region("Safe House Tier 2")
-    safehouseT3 = world.get_region("Safe House Tier 3")
 
     for i in range(1, world.options.run_length.value + 1):
         world.multiworld.regions.append(Region(f"Heist {i}", world.player, world.multiworld))
@@ -56,24 +54,33 @@ def create_and_connect_regions(world: CrimDawnWorld) -> None:
             #print(f"Heist {i-1} Completed requires {itemsForConnection} Time Bonus")
             world.create_entrance(world.get_region(f"Heist {i-1}"), heistRegion, Has("Time Bonus", itemsForConnection), f"Heist {i} Requirements")
 
-    world.create_entrance(crimenet, safehouseT2, None, "276 Coins") #HasAllCounts({"24 Coins": 12, "Time Bonus": world.itemsForGoal // 3}),
-    world.create_entrance(safehouseT2, safehouseT3, None, "828 Coins") #HasAllCounts({"24 Coins": 35, "Time Bonus": 2 * world.itemsForGoal // 3}),
+    for i in range(2, world.options.run_length.value + 1):
+        world.multiworld.regions.append(Region(f"Safe House Tier {i}", world.player, world.multiworld))
+
+        safehouseAccess = Has("24 Coins", count=math.ceil(11.5 * (i - 1))) & CanReachLocation(f"Heist {i - 1} Completed")
+        currentTier = world.get_region(f"Safe House Tier {i}")
+
+        if i == 2:
+            world.create_entrance(crimenet, currentTier, safehouseAccess, f"276 Coins")
+        else:
+            world.create_entrance(lastTier, currentTier, safehouseAccess, f"{23*12*(i-1)} Coins")
+
+        lastTier = currentTier
 
 def create_all_locations(world: CrimDawnWorld) -> None:
     create_score_locations(world)
 
 def create_score_locations(world: CrimDawnWorld) -> None:
     # Create regions, assign a location to each region, chain entrances together
-    for i in range(2,4):
+    for i in range(2, world.options.run_length.value + 1):
         safehouse = world.get_region(f"Safe House Tier {i}")
         for room in safehouseRooms:
-            locName = f"{room} - Tier {i}"
+            locName = f"{room} (Tier {i})"
             locId = world.location_name_to_id[locName]
             location = CrimDawnLocation(world.player, locName, locId, safehouse)
             location.progress_type = LocationProgressType.EXCLUDED
             safehouse.locations.append(location)
             forbid_item(location, "24 Coins", world.player)
-            forbid_item(location, "6 Coins", world.player)
 
     firstHeist = world.get_region("Crime.net")
 
