@@ -56,7 +56,6 @@ class scrungle:
         self.context = context
         self.path = path
 
-    # function derived from Project Diva APWorld
     async def watch(self):
         modSave = load_json_file(self.path)
         prevScore = 0
@@ -65,7 +64,6 @@ class scrungle:
         lastChatTime = math.floor(time.time())
         lastModTime = 0
         deathMsgs = ["left their favourite cassette in the escape car.",
-                     "will never hear those songs again.",
                      "needs to get their head examined.",
                      "learned that crime doesn't pay.",
                      "watched dawn turn to dusk.",
@@ -88,7 +86,6 @@ class scrungle:
                             run = modSave["game"]["run"]
                             heistsWon = modSave["game"]["heists_won"]
 
-                            # Not in the except so people that play without autorelease can continue getting checks
                             if score > prevScore:
                                 await self.context.score_check(score)
                                 prevScore = score
@@ -103,6 +100,7 @@ class scrungle:
                                 prevHeistsWon = heistsWon
 
                             if prevRun == -1: prevRun = run
+
                             # Send deathlink
                             if prevRun < run:
                                 prevRun = run
@@ -131,10 +129,12 @@ class scrungle:
                                 lastChatTime = chatTimestamp
                         except Exception as e:
                             print(f"Couldn't find crimdawn_save.txt: {e}")
+
                 await asyncio.sleep(1)
 
             except asyncio.CancelledError:
                 print("Scrungle stopped watching. Scrungle bored.")
+                break
             except Exception as e:
                 print(e)
 
