@@ -1,4 +1,10 @@
-from CommonClient import CommonContext, ClientCommandProcessor, server_loop, get_base_parser, handle_url_arg, logger
+tracker_loaded = False
+try:
+    from worlds.tracker.TrackerClient import TrackerGameContext as CommonContext
+    tracker_loaded = True
+except ModuleNotFoundError:
+    from CommonClient import CommonContext
+from CommonClient import ClientCommandProcessor, server_loop, get_base_parser, handle_url_arg, logger
 import Utils, asyncio, colorama, logging, json, os, math, time, random
 from . import CrimDawnWorld
 from . import items
@@ -134,6 +140,7 @@ class scrungle:
 
 class CrimDawnContext(CommonContext):
     game = "PAYDAY 2: Criminal Dawn"
+    tags = {"AP"}
     command_processor = CrimDawnCommandProcessor
     items_handling = 0b111
 
@@ -150,6 +157,7 @@ class CrimDawnContext(CommonContext):
         await self.send_connect()
 
     def on_package(self, cmd: str, args: dict):
+        super().on_package(cmd, args)
         if cmd == 'Connected':
             self.on_connected(args)
         elif cmd == "ReceivedItems":
@@ -326,17 +334,10 @@ class CrimDawnContext(CommonContext):
         await asyncio.sleep(3)
         self.deathLinkPending = False
 
-    def run_gui(self):
-        from kvui import GameManager
-
-        class CrimDawnManager(GameManager):
-            logging_pairs = [
-                ("Client", "Archipelago")
-            ]
-            base_title = self.game + " Client"
-
-        self.ui = CrimDawnManager(self)
-        self.ui_task = asyncio.create_task(self.ui.async_run(), name="UI")
+    def make_gui(self):
+        ui = super().make_gui()
+        ui.base_title = f"{self.game} Client"
+        return ui
 
 def launch_client(*args: Sequence[str]):
     Utils.init_logging('CrimDawnClient')
@@ -346,6 +347,8 @@ def launch_client(*args: Sequence[str]):
         ctx = CrimDawnContext(args.connect, args.password)
         ctx.server_task = asyncio.create_task(server_loop(ctx), name='ServerLoop')
 
+        if tracker_loaded:
+            ctx.run_generator()
         if Utils.gui_enabled:
             ctx.run_gui()
         ctx.run_cli()
