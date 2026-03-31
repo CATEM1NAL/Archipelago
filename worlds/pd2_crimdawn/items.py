@@ -21,20 +21,20 @@ trapItemDict: dict[int, itemData] = {
 }
 
 usefulItemDict: dict[int, itemData] = {
-    200: itemData(IC.progression, 58, "24 Coins"),
+    200: itemData(IC.progression_deprioritized_skip_balancing, 57, "24 Coins"),
     201: itemData(IC.useful, 2, "OVE9000 Saw"),
     202: itemData(IC.useful, 13, "Skill"),
     203: itemData(IC.useful, 13, "Perk"),
 }
 
 fillerItemDict: dict[int, itemData] = {
-    300: itemData(IC.filler, 18, "Primary Weapon"),
+    300: itemData(IC.useful, 18, "Primary Weapon"),
     301: itemData(IC.filler, 41, "Akimbo"),
-    302: itemData(IC.filler, 23, "Secondary Weapon"),
+    302: itemData(IC.useful, 23, "Secondary Weapon"),
     303: itemData(IC.filler, 18, "Melee Weapon"),
     304: itemData(IC.filler, 5, "Throwable"),
-    305: itemData(IC.filler, 6, "Armor"),
-    306: itemData(IC.filler, 9, "Deployable"),
+    305: itemData(IC.useful, 6, "Armor"),
+    306: itemData(IC.useful, 9, "Deployable"),
     307: itemData(IC.filler, 13, "Stat Boost")
 }
 
