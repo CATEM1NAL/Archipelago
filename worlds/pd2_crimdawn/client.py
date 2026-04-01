@@ -199,22 +199,11 @@ class CrimDawnContext(CommonContext):
                 tier = 1
                 count = 0
 
-                itemTypeMap = {
-                    0: "", # filler
-                    1: "##", # progression
-                    2: "##", # useful
-                    3: "##", # useful progression
-                    4: "", # trap
-                    5: "##", # progression trap
-                    6: "##", # useful trap
-                    7: "##" # useful progression trap
-                }
                 rooms = {}
                 for NetworkItem in args["locations"]:
                     playerName = self.player_names[NetworkItem.player]
                     itemName = self.item_names.lookup_in_slot(NetworkItem.item, NetworkItem.player)
-                    itemType = itemTypeMap[NetworkItem.flags]
-                    itemHint = f"{playerName}'s {itemType}{itemName}{itemType}"
+                    itemHint = f"{playerName}'s ##{itemName}##."
 
                     #print(f"{self.location_names.lookup_in_slot(NetworkItem.location)}: {itemName}")
 
