@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 def triangle(n: int) -> int:
     return n * (n + 1) // 2
 
-maxScoreLocations = (366) + 1
+maxScoreLocations = (368) + 1
 LOCATION_NAME_TO_ID = { f"{triangle(i)} Points" : i for i in range(1, maxScoreLocations) }
 
 safehouseRooms = ["Scarface's Room", "Dallas' Office", "Hoxton's Files", "Clover's Surveillance Center",
@@ -22,12 +22,13 @@ safehouseRooms = ["Scarface's Room", "Dallas' Office", "Hoxton's Files", "Clover
                "Sangres' Cave", "Chains' Weapons Workshop", "Bodhi's Surfboard Workshop", "Jacket's Hangout",
                  "Sokol's Hockey Gym", "Dragan's Gym", "Vault", "Wolf's Workshop", "Wick's Shooting Range"]
 
-LOCATION_NAME_TO_ID.update({f"{room} (Tier 2)": key + maxScoreLocations for key, room in enumerate(safehouseRooms)})
-LOCATION_NAME_TO_ID.update({f"{room} (Tier 3)": key + maxScoreLocations + len(safehouseRooms) for key, room in enumerate(safehouseRooms)})
-LOCATION_NAME_TO_ID.update({f"{room} (Tier 4)": key + maxScoreLocations + (len(safehouseRooms) * 2) for key, room in enumerate(safehouseRooms)})
-LOCATION_NAME_TO_ID.update({f"{room} (Tier 5)": key + maxScoreLocations + (len(safehouseRooms) * 3) for key, room in enumerate(safehouseRooms)})
-LOCATION_NAME_TO_ID.update({f"{room} (Tier 6)": key + maxScoreLocations + (len(safehouseRooms) * 4) for key, room in enumerate(safehouseRooms)})
-LOCATION_NAME_TO_ID.update({f"Heist {i} Completed": i + maxScoreLocations + (len(safehouseRooms) * 5) for i in range(1, 7)})
+LOCATION_NAME_TO_ID.update({f"{room} (Tier 1)": key + maxScoreLocations for key, room in enumerate(safehouseRooms)})
+LOCATION_NAME_TO_ID.update({f"{room} (Tier 2)": key + maxScoreLocations + len(safehouseRooms) for key, room in enumerate(safehouseRooms)})
+LOCATION_NAME_TO_ID.update({f"{room} (Tier 3)": key + maxScoreLocations + (len(safehouseRooms) * 2) for key, room in enumerate(safehouseRooms)})
+LOCATION_NAME_TO_ID.update({f"{room} (Tier 4)": key + maxScoreLocations + (len(safehouseRooms) * 3) for key, room in enumerate(safehouseRooms)})
+LOCATION_NAME_TO_ID.update({f"{room} (Tier 5)": key + maxScoreLocations + (len(safehouseRooms) * 4) for key, room in enumerate(safehouseRooms)})
+LOCATION_NAME_TO_ID.update({f"{room} (Tier 6)": key + maxScoreLocations + (len(safehouseRooms) * 5) for key, room in enumerate(safehouseRooms)})
+LOCATION_NAME_TO_ID.update({f"Heist {i} Completed": i + maxScoreLocations + (len(safehouseRooms) * 6) for i in range(1, 7)})
 
 class CrimDawnLocation(Location):
     game = "PAYDAY 2: Criminal Dawn"
@@ -54,11 +55,11 @@ def create_and_connect_regions(world: CrimDawnWorld) -> None:
             #print(f"Heist {i-1} Completed requires {itemsForConnection} Time Bonus")
             world.create_entrance(world.get_region(f"Heist {i-1}"), heistRegion, Has("Time Bonus", itemsForConnection), f"Heist {i} Requirements")
 
-    for i in range(2, world.options.run_length.value + 1):
+    for i in range(1, world.options.run_length.value + 1):
         currentTier = Region(f"Safe House Tier {i}", world.player, world.multiworld)
         world.multiworld.regions.append(currentTier)
 
-        safehouseAccess = Has("24 Coins", math.ceil(11.5 * i - 12))
+        safehouseAccess = Has("Coins", 11 * i)
         print(safehouseAccess)
 
         world.create_entrance(world.get_region(f"Heist {i}"), currentTier, safehouseAccess, f"{23*12*(i-1)} Coins")
@@ -68,14 +69,14 @@ def create_all_locations(world: CrimDawnWorld) -> None:
 
 def create_score_locations(world: CrimDawnWorld) -> None:
     # Create regions, assign a location to each region, chain entrances together
-    for i in range(2, world.options.run_length.value + 1):
+    for i in range(1, world.options.run_length.value + 1):
         safehouse = world.get_region(f"Safe House Tier {i}")
         for room in safehouseRooms:
             locName = f"{room} (Tier {i})"
             locId = world.location_name_to_id[locName]
             location = CrimDawnLocation(world.player, locName, locId, safehouse)
             safehouse.locations.append(location)
-            forbid_item(location, "24 Coins", world.player)
+            forbid_item(location, "Coins", world.player)
 
     firstHeist = world.get_region("Crime.net")
 

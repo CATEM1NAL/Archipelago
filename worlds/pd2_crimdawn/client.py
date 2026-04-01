@@ -308,7 +308,7 @@ class CrimDawnContext(CommonContext):
 
             for key, tier in safehouseDict.items():
                 for i in range(2,tier+1):
-                    Id = LOCATION_NAME_TO_ID[f"{safehouseIdToName[key]} - Tier {i}"]
+                    Id = LOCATION_NAME_TO_ID[f"{safehouseIdToName[key]} (Tier {i})"]
                     await self.check_locations([Id])
 
         except KeyError as e:
