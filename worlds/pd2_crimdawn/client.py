@@ -24,7 +24,6 @@ def load_json_file(fileName: str) -> dict:
         return {}
 
 class CrimDawnCommandProcessor(ClientCommandProcessor):
-
     def _score(self):
         """Displays your current score."""
         if isinstance(self.ctx, CrimDawnContext):
@@ -212,6 +211,7 @@ class CrimDawnContext(CommonContext):
                 with open(self.path + "crimdawn_rooms.txt", "w+") as f:
                     json.dump(rooms, f)
                 return
+
             super().on_package(cmd, args)
 
         if cmd == "Bounced":
@@ -338,22 +338,24 @@ class CrimDawnContext(CommonContext):
             # Solve triangular number
             n = self.getN(score)
             for i in range(1, n + 1):
-                await self.check_locations([i])
+                if i in self.missing_locations:
+                    await self.check_locations([i])
 
             self.score = score
-                
+
         except KeyError as e:
-            logger.error(e)
+            logger.error(f"Score Key Error: {e}")
 
     async def safehouse_check(self, safehouseDict):
         try:
             for key, tier in safehouseDict.items():
                 for i in range(1, tier):
-                    Id = LOCATION_NAME_TO_ID[f"{self.safehouseIdToName[key].name} (Tier {i})"]
-                    await self.check_locations([Id])
+                    id = LOCATION_NAME_TO_ID[f"{self.safehouseIdToName[key].name} (Tier {i})"]
+                    if id in self.missing_locations:
+                        await self.check_locations([id])
 
         except KeyError as e:
-            logger.error(e)
+            logger.error(f"Safehouse Key Error: {e}")
 
     # Deathlink handlers
     def on_deathlink(self, data: dict):
