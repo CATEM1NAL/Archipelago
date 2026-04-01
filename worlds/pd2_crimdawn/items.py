@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 
 import math
 from BaseClasses import Item, ItemClassification as IC
-from .item_types import itemData
+from .data_structs import itemData
 
 if TYPE_CHECKING:
     from .world import CrimDawnWorld

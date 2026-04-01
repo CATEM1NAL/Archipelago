@@ -6,8 +6,8 @@ except ModuleNotFoundError:
     from CommonClient import CommonContext
 from CommonClient import ClientCommandProcessor, server_loop, get_base_parser, handle_url_arg, logger
 import Utils, asyncio, colorama, logging, json, os, math, time, random
-from . import CrimDawnWorld
-from . import items
+from . import CrimDawnWorld, items
+from .data_structs import safeHouseData
 from collections.abc import Sequence
 from .locations import LOCATION_NAME_TO_ID
 
@@ -90,12 +90,12 @@ class scrungle:
                                 await self.context.score_check(score)
                                 prevScore = score
 
-                            if heistsWon > prevHeistsWon:
+                            if prevHeistsWon < heistsWon <= self.context.runLength:
                                 for i in range (1, heistsWon + 1):
                                     print(f"Heist {i} Completed")
                                     heist = LOCATION_NAME_TO_ID[f"Heist {i} Completed"]
                                     await self.context.check_locations([heist])
-                                if heistsWon > self.context.runLength - 1:
+                                if heistsWon >= self.context.runLength:
                                     await self.context.send_msgs([{"cmd": "StatusUpdate", "status": ClientStatus.CLIENT_GOAL}])
                                 prevHeistsWon = heistsWon
 
@@ -149,6 +149,33 @@ class CrimDawnContext(CommonContext):
         self.score = 0
         self.scrungle_task = None
         self.deathLinkPending = False
+        self.createRoomLoc = False
+
+        self.safehouseIdToName = {
+            "terry": safeHouseData("Scarface's Room", "menu_cs_help_terry"),
+            "russian": safeHouseData("Dallas' Office", "menu_cs_help_dallas"),
+            "old_hoxton": safeHouseData("Hoxton's Files", "menu_cs_help_hoxton"),
+            "clover": safeHouseData("Clover's Surveillance Center", "menu_cs_help_clover"),
+            "myh": safeHouseData("Duke's Gallery", "menu_cs_help_myh"),
+            "sydney": safeHouseData("Sydney's Studio", "menu_cs_help_sydney"),
+            "american": safeHouseData("Houston's Workshop", "menu_cs_help_houston"),
+            "wild": safeHouseData("Rust's Corner", "menu_cs_help_rust"),
+            "ecp": safeHouseData("h3h3", "menu_cs_help_ecp"),
+            "joy": safeHouseData("Joy's Van", "menu_cs_help_joy"),
+            "bonnie": safeHouseData("Bonnie's Gambling Den", "menu_cs_help_bonnie"),
+            "dragon": safeHouseData("Jiro's Lounge", "menu_cs_help_dragon"),
+            "dragan": safeHouseData("Dragan's Gym", "menu_cs_help_dragan"),
+            "jimmy": safeHouseData("Jimmy's Bar", "menu_cs_help_jimmy"),
+            "livingroom": safeHouseData("Common Rooms", "menu_cs_help_common_room"),
+            "max": safeHouseData("Sangres' Cave", "menu_cs_help_max"),
+            "spanish": safeHouseData("Chains' Weapons Workshop", "menu_cs_help_chains"),
+            "bodhi": safeHouseData("Bodhi's Surfboard Workshop", "menu_cs_help_bodhi"),
+            "jacket": safeHouseData("Jacket's Hangout", "menu_cs_help_jacket"),
+            "sokol": safeHouseData("Sokol's Hockey Gym", "menu_cs_help_sokol"),
+            "vault": safeHouseData("Vault", "menu_cs_help_vault"),
+            "german": safeHouseData("Wolf's Workshop", "menu_cs_help_wolf"),
+            "jowi": safeHouseData("Wick's Shooting Range", "menu_cs_help_jowi")
+        }
 
     async def server_auth(self, password_requested: bool = False):
         if password_requested and not self.password:
@@ -157,12 +184,55 @@ class CrimDawnContext(CommonContext):
         await self.send_connect()
 
     def on_package(self, cmd: str, args: dict):
-        super().on_package(cmd, args)
+
         if cmd == 'Connected':
             self.on_connected(args)
-        elif cmd == "ReceivedItems":
+
+        if cmd == "ReceivedItems":
             self.on_received_items(args)
-        elif cmd == "Bounced":
+
+        if cmd == "LocationInfo":
+            if self.createRoomLoc:
+                self.createRoomLoc = False
+
+                keys = list(self.safehouseIdToName)
+                tier = 1
+                count = 0
+
+                itemTypeMap = {
+                    0: "", # filler
+                    1: "##", # progression
+                    2: "##", # useful
+                    3: "##", # useful progression
+                    4: "", # trap
+                    5: "##", # progression trap
+                    6: "##", # useful trap
+                    7: "##" # useful progression trap
+                }
+                rooms = {}
+                for NetworkItem in args["locations"]:
+                    playerName = self.player_names[NetworkItem.player]
+                    itemName = self.item_names.lookup_in_slot(NetworkItem.item, NetworkItem.player)
+                    itemType = itemTypeMap[NetworkItem.flags]
+                    itemHint = f"{playerName}'s {itemType}{itemName}{itemType}"
+
+                    #print(f"{self.location_names.lookup_in_slot(NetworkItem.location)}: {itemName}")
+
+                    #print(f"{self.location_names.lookup_in_slot(NetworkItem.location)}: {self.safehouseIdToName[keys[count]]}, {tier}")
+                    rooms[f"{self.safehouseIdToName[keys[count]].descId}_{tier}"] = itemHint
+
+                    count += 1
+                    if count == 23:
+                        tier += 1
+                        count = 0
+                with open(self.path + "crimdawn_rooms.txt", "w+") as f:
+                    json.dump(rooms, f)
+                    #print(itemHint)
+                #print(args["locations"])
+                return
+            super().on_package(cmd, args)
+
+        if cmd == "Bounced":
             if "tags" in args:
                 if "DeathLink" in args["tags"]:
                     self.on_deathlink(args["data"])
@@ -239,6 +309,21 @@ class CrimDawnContext(CommonContext):
         if self.deathLinkEnabled:
             asyncio.create_task(self.update_death_link(True))
 
+        keys = list(self.safehouseIdToName)
+        self.safehouseRooms = []
+        for i in range(1, self.runLength + 1):
+            for j in range(23):
+                self.safehouseRooms.append(LOCATION_NAME_TO_ID[f"{self.safehouseIdToName[keys[j]].name} (Tier {i})"])
+                #print(f"{self.safehouseIdToName[keys[j]].name} (Tier {i})")
+
+        if not os.path.isfile(self.path + "crimdawn_rooms.txt"):
+            self.createRoomLoc = True
+            asyncio.create_task(self.send_msgs([{
+                "cmd": "LocationScouts",
+                "locations": self.safehouseRooms,
+                "create_as_hint": 0
+            }]))
+
     def on_received_items(self, args: dict):
         # for entry in self.items_received:
         for entry in args["items"]:
@@ -280,35 +365,9 @@ class CrimDawnContext(CommonContext):
 
     async def safehouse_check(self, safehouseDict):
         try:
-            safehouseIdToName = {
-                "terry": "Scarface's Room",
-                "russian": "Dallas' Office",
-                "old_hoxton": "Hoxton's Files",
-                "clover": "Clover's Surveillance Center",
-                "myh": "Duke's Gallery",
-                "sydney": "Sydney's Studio",
-                "american": "Houston's Workshop",
-                "wild": "Rust's Corner",
-                "ecp": "h3h3",
-                "joy": "Joy's Van",
-                "bonnie": "Bonnie's Gambling Den",
-                "dragon": "Jiro's Lounge",
-                "dragan": "Dragan's Gym",
-                "jimmy": "Jimmy's Bar",
-                "livingroom": "Common Rooms",
-                "max": "Sangres' Cave",
-                "spanish": "Chains' Weapons Workshop",
-                "bodhi": "Bodhi's Surfboard Workshop",
-                "jacket": "Jacket's Hangout",
-                "sokol": "Sokol's Hockey Gym",
-                "vault": "Vault",
-                "german": "Wolf's Workshop",
-                "jowi": "Wick's Shooting Range"
-            }
-
             for key, tier in safehouseDict.items():
                 for i in range(1,tier+1):
-                    Id = LOCATION_NAME_TO_ID[f"{safehouseIdToName[key]} (Tier {i})"]
+                    Id = LOCATION_NAME_TO_ID[f"{self.safehouseIdToName[key].name} (Tier {i - 1})"]
                     await self.check_locations([Id])
 
         except KeyError as e:
