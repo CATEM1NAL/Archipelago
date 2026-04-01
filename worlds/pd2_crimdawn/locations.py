@@ -52,7 +52,6 @@ def create_and_connect_regions(world: CrimDawnWorld) -> None:
         if i == 1:
             world.create_entrance(crimenet, heistRegion,None,"Start Run")
         else: #Create Entrance connecting the heist region to the previous heist region
-            #print(f"Heist {i-1} Completed requires {itemsForConnection} Time Bonus")
             world.create_entrance(world.get_region(f"Heist {i-1}"), heistRegion, Has("Time Bonus", itemsForConnection), f"Heist {i} Requirements")
 
     for i in range(1, world.options.run_length.value + 1):
@@ -60,8 +59,6 @@ def create_and_connect_regions(world: CrimDawnWorld) -> None:
         world.multiworld.regions.append(currentTier)
 
         safehouseAccess = Has("Coins", 11 * i)
-        print(safehouseAccess)
-
         world.create_entrance(world.get_region(f"Heist {i}"), currentTier, safehouseAccess, f"{23*12*(i-1)} Coins")
 
 def create_all_locations(world: CrimDawnWorld) -> None:
@@ -103,7 +100,6 @@ def create_score_locations(world: CrimDawnWorld) -> None:
 
             elif 4 * (world.options.score_checks / max(world.itemsForGoal - 1, 1)) <= i < world.options.score_checks:
                 timeBonuses =  round(i / (world.options.score_checks / max(world.itemsForGoal - 1, 1)))
-                #print(i // (world.options.score_checks // world.itemsForGoal - 1))
                 requiredTimeBonuses.update({triangle(i): timeBonuses})
 
             elif i == world.options.score_checks:
@@ -114,11 +110,6 @@ def create_score_locations(world: CrimDawnWorld) -> None:
             else:
                 timeBonuses = 0
                 requiredTimeBonuses.update({triangle(i): 0})
-
-            #print(f"{location.name} ({world.player_name}):\n"
-            #      f"  Time Bonuses: {timeBonuses}\n"
-            #      f"  Extra Bot: {bots}\n"
-            #      f"  Perma-Stuff: {i // (world.options.score_checks // world.options.run_length.value)}")
 
             locationRule = HasAllCounts({"Time Bonus": timeBonuses,
                                          "Extra Bot": bots,
@@ -140,7 +131,6 @@ def create_score_locations(world: CrimDawnWorld) -> None:
             required += 1
         prevScore = score
     world.locationToScoreCap.append(triangle(world.options.score_checks))
-    #print(world.locationToScoreCap)
 
     location = world.get_location(f"Heist {world.options.run_length.value} Completed")
     locationRule = HasAllCounts({"Time Bonus": world.itemsForGoal,

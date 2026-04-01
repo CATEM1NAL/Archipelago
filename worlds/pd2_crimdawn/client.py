@@ -184,7 +184,6 @@ class CrimDawnContext(CommonContext):
         await self.send_connect()
 
     def on_package(self, cmd: str, args: dict):
-
         if cmd == 'Connected':
             self.on_connected(args)
 
@@ -205,19 +204,13 @@ class CrimDawnContext(CommonContext):
                     itemName = self.item_names.lookup_in_slot(NetworkItem.item, NetworkItem.player)
                     itemHint = f"{playerName}'s ##{itemName}##."
 
-                    #print(f"{self.location_names.lookup_in_slot(NetworkItem.location)}: {itemName}")
-
-                    #print(f"{self.location_names.lookup_in_slot(NetworkItem.location)}: {self.safehouseIdToName[keys[count]]}, {tier}")
                     rooms[f"{self.safehouseIdToName[keys[count]].descId}_{tier}"] = itemHint
-
                     count += 1
                     if count == 23:
                         tier += 1
                         count = 0
                 with open(self.path + "crimdawn_rooms.txt", "w+") as f:
                     json.dump(rooms, f)
-                    #print(itemHint)
-                #print(args["locations"])
                 return
             super().on_package(cmd, args)
 
@@ -355,8 +348,8 @@ class CrimDawnContext(CommonContext):
     async def safehouse_check(self, safehouseDict):
         try:
             for key, tier in safehouseDict.items():
-                for i in range(1,tier+1):
-                    Id = LOCATION_NAME_TO_ID[f"{self.safehouseIdToName[key].name} (Tier {i - 1})"]
+                for i in range(1, tier):
+                    Id = LOCATION_NAME_TO_ID[f"{self.safehouseIdToName[key].name} (Tier {i})"]
                     await self.check_locations([Id])
 
         except KeyError as e:
