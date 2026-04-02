@@ -58,8 +58,8 @@ def create_and_connect_regions(world: CrimDawnWorld) -> None:
         currentTier = Region(f"Safe House Tier {i}", world.player, world.multiworld)
         world.multiworld.regions.append(currentTier)
 
-        safehouseAccess = Has("Coins", 11 * i)
-        world.create_entrance(world.get_region(f"Heist {i}"), currentTier, safehouseAccess, f"{23*12*(i-1)} Coins")
+        safehouseAccess = Has("Coins", math.ceil(11.5 * i))
+        world.create_entrance(world.get_region(f"Heist {i}"), currentTier, safehouseAccess, f"{23*i} Coins")
 
 def create_all_locations(world: CrimDawnWorld) -> None:
     create_score_locations(world)
