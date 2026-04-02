@@ -183,6 +183,8 @@ class CrimDawnContext(CommonContext):
         await self.send_connect()
 
     def on_package(self, cmd: str, args: dict):
+        super().on_package(cmd, args) # THIS IS FOR UNIVERSAL TRACKER, DIPSHIT.
+
         if cmd == 'Connected':
             self.on_connected(args)
 
@@ -220,6 +222,10 @@ class CrimDawnContext(CommonContext):
                     self.on_deathlink(args["data"])
 
     def on_connected(self, args: dict):
+        if self.scrungle_task:
+            self.scrungle_task.cancel()
+            self.scrungle_task = None
+
         version = CrimDawnWorld.world_version.as_simple_string()
         self.timeBonusReceived = 0
 
