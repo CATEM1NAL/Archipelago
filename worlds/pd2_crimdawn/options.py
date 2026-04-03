@@ -8,14 +8,14 @@ class GamePace(Choice):
     The speed at which the world can be played. Slower speeds are more likely to get stuck.
 
     QUICK: Start with 20 minutes, gain 20 with each time bonus.
-    With default settings this can take around ?? hours to goal.
+    With 100 score checks and 4 heists this can take around ?? hours to goal.
 
     STANDARD: Start with 10 minutes, gain 10 with each time bonus.
     With default settings this can take around 12 hours to goal.
 
     GLACIAL: Start with 5 minutes, gain 5 with each time bonus. Typically leads to more spheres.
     Increasing the number of score checks to at least 150 is recommended!
-    With 150 score checks and default settings this can take around ?? hours to goal.
+    With 150 score checks and 6 heists this can take around ?? hours to goal.
     """
 
     display_name = "Progression Pacing"
@@ -58,8 +58,8 @@ class ScoreLocations(Range):
 
     display_name = "Score Checks"
 
-    range_start = 120
-    range_end = 386
+    range_start = 100
+    range_end = 400
     default = 120
 
 class BotCount(Toggle):
@@ -89,13 +89,13 @@ class PrimaryCount(Range):
     """
     The base number of primary weapons the multiworld will try to generate.
     Actual number may be higher or lower depending on the number of locations available.
-    18 is the most you can have without DLC - extra items will do nothing.
+    19 is the most you can have without DLC - extra items will do nothing.
     """
 
     display_name = "Primary Weapons"
 
     range_start = 0
-    range_end = 72
+    range_end = 73
     default = 10
 
 class AkimboCount(Range):
@@ -115,40 +115,40 @@ class SecondaryCount(Range):
     """
     The base number of secondary weapons the multiworld will try to generate.
     Actual number may be higher or lower depending on the number of locations available.
-    23 is the most you can have without DLC - extra items will do nothing.
+    24 is the most you can have without DLC - extra items will do nothing.
     """
 
     display_name = "Secondary Weapons"
 
     range_start = 0
-    range_end = 66
+    range_end = 67
     default = 10
 
 class MeleeCount(Range):
     """
     The base number of melee weapons the multiworld will try to generate.
     Actual number may be higher or lower depending on the number of locations available.
-    18 is the most you can have without DLC - extra items will do nothing.
+    19 is the most you can have without DLC - extra items will do nothing.
     """
 
     display_name = "Melee Weapons"
 
     range_start = 0
-    range_end = 86
+    range_end = 87
     default = 5
 
 class ThrowableCount(Range):
     """
     The base number of throwables the multiworld will try to generate.
     Actual number may be higher or lower depending on the number of locations available.
-    5 is the most you can have without DLC - extra items will do nothing.
+    6 is the most you can have without DLC - extra items will do nothing.
     """
 
     display_name = "Throwables"
 
     range_start = 0
-    range_end = 9
-    default = 5
+    range_end = 10
+    default = 6
 
 class MaxDiff(Choice):
     """
