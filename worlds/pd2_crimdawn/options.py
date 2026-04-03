@@ -148,7 +148,7 @@ class ThrowableCount(Range):
 
     range_start = 0
     range_end = 10
-    default = 6
+    default = 5
 
 class MaxDiff(Choice):
     """
@@ -163,6 +163,9 @@ class MaxDiff(Choice):
 
     display_name = "Final Difficulty"
 
+    option_normal = 1
+    option_hard = 2
+    option_very_hard = 3
     option_overkill = 4
     option_mayhem = 5
     option_death_wish = 6
