@@ -74,6 +74,6 @@ class CrimDawnWorld(World):
         args["server_version"] = self.world_version.as_simple_string()
         args["seed_name"] = f"cd_{self.multiworld.seed_name}"
         args["score_caps"] = self.locationToScoreCap
-        args["diff_scale_count"] = ((10 * self.options.run_length.value - self.options.progression_pacing.value) / self.options.progression_pacing.value) + self.botCount + 16
+        args["diff_scale_count"] = self.botCount + 14
 
         return args

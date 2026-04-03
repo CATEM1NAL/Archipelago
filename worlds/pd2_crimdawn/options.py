@@ -171,7 +171,7 @@ class MaxDiff(Choice):
     option_death_wish = 6
     option_death_sentence = 7
 
-    default = 6
+    default = 4
 
 class DeathLink(Toggle):
     """
