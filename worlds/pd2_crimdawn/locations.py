@@ -47,7 +47,7 @@ def create_and_connect_regions(world: CrimDawnWorld) -> None:
         location.progress_type = LocationProgressType.PRIORITY
         heistRegion.locations.append(location)
 
-        itemsForConnection = math.floor(world.itemsForGoal / world.options.run_length.value * i)
+        itemsForConnection = round(world.itemsForGoal / world.options.run_length.value * i)
 
         if i == 1:
             world.create_entrance(crimenet, heistRegion,None,"Start Run")
