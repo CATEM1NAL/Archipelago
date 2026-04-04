@@ -49,26 +49,30 @@ def create_and_connect_regions(world: CrimDawnWorld) -> None:
         heistRegion.locations.append(location)
 
         if i == 1:
-            itemsForConnection = math.floor(10 / world.options.progression_pacing.value - 1)
+            itemsForConnection = math.floor(10 / world.options.progression_pacing.value - 0.5)
+            #itemsForConnection = 0
+            #if world.options.progression_pacing.value < 10:
+            #    itemsForConnection = 1
             world.create_entrance(crimenet, heistRegion, Has("Time Bonus", itemsForConnection),"Start Run")
         else: #Create Entrance connecting the heist region to the previous heist region
-            itemsForConnection = round(world.itemsForGoal / world.options.run_length.value * i)
+            #itemsForConnection = math.floor(world.itemsForGoal / world.options.run_length.value * i)
+            itemsForConnection = math.ceil(((i * 15) / world.options.progression_pacing) - 1)
             world.create_entrance(world.get_region(f"Heist {i - 1}"), heistRegion, Has("Time Bonus", itemsForConnection), f"Heist {i} Requirements")
+
         print(f"Heist {i}: {itemsForConnection} time bonuses ({world.options.progression_pacing.value * (itemsForConnection + 1)} minutes)")
 
+def create_safe_house(world: CrimDawnWorld) -> None:
     # Safehouse checks
     for i in range(1, world.options.run_length.value + 1):
         currentTier = Region(f"Safe House Tier {i}", world.player, world.multiworld)
         world.multiworld.regions.append(currentTier)
 
         safehouseAccess = Has("Coins", math.ceil(11.5 * i))
-        world.create_entrance(world.get_region(f"Heist {i}"), currentTier, safehouseAccess, f"{23*i} Coins")
+        if i == 1:
+            safehouseAccess = safehouseAccess & CanReachLocation(f"{triangle(12)} Points")
 
-def create_all_locations(world: CrimDawnWorld) -> None:
-    create_score_locations(world)
+        world.create_entrance(world.get_region(f"Heist {i}"), currentTier, safehouseAccess, f"{23 * i} Coins")
 
-def create_score_locations(world: CrimDawnWorld) -> None:
-    # Create regions, assign a location to each region, chain entrances together
     for i in range(1, world.options.run_length.value + 1):
         safehouse = world.get_region(f"Safe House Tier {i}")
         for room in safehouseRooms:
@@ -78,6 +82,12 @@ def create_score_locations(world: CrimDawnWorld) -> None:
             safehouse.locations.append(location)
             forbid_item(location, "Coins", world.player)
 
+def create_all_locations(world: CrimDawnWorld) -> None:
+    create_score_locations(world)
+    create_safe_house(world)
+
+def create_score_locations(world: CrimDawnWorld) -> None:
+    # Create regions, assign a location to each region, chain entrances together
     firstHeist = world.get_region("Crime.net")
 
     requiredTimeBonuses = {}
@@ -89,9 +99,12 @@ def create_score_locations(world: CrimDawnWorld) -> None:
         world.multiworld.regions.append(region)
 
         location = CrimDawnLocation(world.player, locName, locId, region)
+        #if i > 1:
+        #    world.set_rule(location, CanReachLocation(f"{triangle(i-1)} Points"))
         region.locations.append(location)
 
-        bots = (i // (world.options.score_checks // world.botCount)) - 1
+        bots = (i // (world.options.score_checks // world.botCount))
+        #print((i / (world.options.score_checks / world.botCount)) - 1)
 
         if i == 1:
             firstHeist.connect(region, "1 point")
@@ -118,6 +131,7 @@ def create_score_locations(world: CrimDawnWorld) -> None:
                                          "Extra Bot": bots,
                                          "Perma-Perk": i // (world.options.score_checks // world.options.run_length.value),
                                          "Perma-Skill": i // (world.options.score_checks // world.options.run_length.value)})
+            print(f"{locName}: {locationRule}")
 
             world.set_rule(location, locationRule)
 
