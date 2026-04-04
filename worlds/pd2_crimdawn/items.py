@@ -45,7 +45,7 @@ fillerLimitDict: dict[int, int] = {
     303: 18,
     304: 5,
     305: 6,
-    306: 7,
+    306: 9,
     307: 0,
 }
 
@@ -82,13 +82,20 @@ def update_items(world: CrimDawnWorld) -> None:
 
 def get_random_filler_item_name(world: CrimDawnWorld) -> str:
     fillerType = world.random.choice(["weapon", "upgrade"])
-    if fillerType == "weapon": item = fillerItemDict[world.random.randint(300, 304)]
-    elif fillerType == "upgrade": item = fillerItemDict[307]
+
+    if fillerType == "weapon":
+        item = fillerItemDict[world.random.randint(300, 304)]
+
+    elif fillerType == "upgrade":
+        item = fillerItemDict[307]
 
     itemId = ITEM_NAME_TO_ID[item.name]
 
-    if fillerLimitDict[itemId] > 0: fillerLimitDict[itemId] -= 1
-    else: item = fillerItemDict[307]
+    if fillerLimitDict[itemId] > 0:
+        fillerLimitDict[itemId] -= 1
+
+    else:
+        item = fillerItemDict[307]
 
     return item.name
 
@@ -127,6 +134,7 @@ def create_all_items(world: CrimDawnWorld) -> None:
     for itemId, item in fillerItemDict.items():
         for i in range(item.count):
             itemPool.append(world.create_item(item.name))
+            fillerLimitDict[itemId] -= 1
 
     unfilledLocations = len(world.multiworld.get_unfilled_locations(world.player))
     fillerCount = unfilledLocations - len(itemPool)
