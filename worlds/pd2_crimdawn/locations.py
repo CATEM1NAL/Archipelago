@@ -37,6 +37,7 @@ def create_and_connect_regions(world: CrimDawnWorld) -> None:
     world.multiworld.regions.append(Region("Crime.net", world.player, world.multiworld))
     crimenet = world.get_region("Crime.net")
 
+    # Heist completion checks
     for i in range(1, world.options.run_length.value + 1):
         world.multiworld.regions.append(Region(f"Heist {i}", world.player, world.multiworld))
         heistRegion = world.get_region(f"Heist {i}")
@@ -47,13 +48,15 @@ def create_and_connect_regions(world: CrimDawnWorld) -> None:
         location.progress_type = LocationProgressType.PRIORITY
         heistRegion.locations.append(location)
 
-        itemsForConnection = round(world.itemsForGoal / world.options.run_length.value * i)
-
         if i == 1:
-            world.create_entrance(crimenet, heistRegion,None,"Start Run")
+            itemsForConnection = math.floor(10 / world.options.progression_pacing.value - 1)
+            world.create_entrance(crimenet, heistRegion, Has("Time Bonus", itemsForConnection),"Start Run")
         else: #Create Entrance connecting the heist region to the previous heist region
-            world.create_entrance(world.get_region(f"Heist {i-1}"), heistRegion, Has("Time Bonus", itemsForConnection), f"Heist {i} Requirements")
+            itemsForConnection = round(world.itemsForGoal / world.options.run_length.value * i)
+            world.create_entrance(world.get_region(f"Heist {i - 1}"), heistRegion, Has("Time Bonus", itemsForConnection), f"Heist {i} Requirements")
+        print(f"Heist {i}: {itemsForConnection} time bonuses ({world.options.progression_pacing.value * (itemsForConnection + 1)} minutes)")
 
+    # Safehouse checks
     for i in range(1, world.options.run_length.value + 1):
         currentTier = Region(f"Safe House Tier {i}", world.player, world.multiworld)
         world.multiworld.regions.append(currentTier)
