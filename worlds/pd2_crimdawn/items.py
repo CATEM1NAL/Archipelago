@@ -134,7 +134,6 @@ def create_all_items(world: CrimDawnWorld) -> None:
     for itemId, item in fillerItemDict.items():
         for i in range(item.count):
             itemPool.append(world.create_item(item.name))
-            fillerLimitDict[itemId] -= 1
 
     unfilledLocations = len(world.multiworld.get_unfilled_locations(world.player))
     fillerCount = unfilledLocations - len(itemPool)
