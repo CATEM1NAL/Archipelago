@@ -50,10 +50,8 @@ def create_and_connect_regions(world: CrimDawnWorld) -> None:
 
         if i == 1:
             itemsForConnection = math.floor(10 / world.options.progression_pacing.value - 0.5)
-            #itemsForConnection = 0
-            #if world.options.progression_pacing.value < 10:
-            #    itemsForConnection = 1
             world.create_entrance(crimenet, heistRegion, Has("Time Bonus", itemsForConnection),"Start Run")
+            #world.create_entrance(crimenet, heistRegion, None, "Start Run")
         else: #Create Entrance connecting the heist region to the previous heist region
             #itemsForConnection = math.floor(world.itemsForGoal / world.options.run_length.value * i)
             itemsForConnection = math.ceil(((i * 15) / world.options.progression_pacing) - 1)
@@ -68,8 +66,8 @@ def create_safe_house(world: CrimDawnWorld) -> None:
         world.multiworld.regions.append(currentTier)
 
         safehouseAccess = Has("Coins", math.ceil(11.5 * i))
-        if i == 1:
-            safehouseAccess = safehouseAccess & CanReachLocation(f"{triangle(12)} Points")
+        #if i == 1:
+        #    safehouseAccess = safehouseAccess & CanReachLocation(f"{triangle(12)} Points")
 
         world.create_entrance(world.get_region(f"Heist {i}"), currentTier, safehouseAccess, f"{23 * i} Coins")
 
