@@ -13,7 +13,7 @@ class GamePace(Choice):
     STANDARD: Start with 10 minutes, gain 10 with each time bonus.
     With default settings this can take around 12 hours to goal.
 
-    GLACIAL: Start with 5 minutes, gain 5 with each time bonus. Typically leads to more spheres.
+    GLACIAL: Start with 10 minutes, gain 5 with each time bonus. Typically leads to more spheres.
     Increasing the number of score checks to at least 150 is recommended!
     With 150 score checks and 6 heists this can take around ?? hours to goal.
     """
