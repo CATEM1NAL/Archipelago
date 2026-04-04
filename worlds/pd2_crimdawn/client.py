@@ -267,7 +267,7 @@ class CrimDawnContext(CommonContext):
                              "1) Launch PAYDAY 2.\n"
                              "2) Click 'OPTIONS'.\n"
                              "3) Click 'ADVANCED'.\n"
-                             "4) Click 'RESET ACCOUNT PROGRESSION'.\n"
+                             "4) Click 'RESET MULTIWORLD DATA'.\n"
                              "5) Click 'YES' and wait for the game to reload.\n\n"
                              "You can reconnect after the game finishes reloading.")
                 Utils.async_start(self.disconnect())

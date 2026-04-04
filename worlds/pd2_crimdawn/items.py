@@ -83,7 +83,7 @@ def update_items(world: CrimDawnWorld) -> None:
 def get_random_filler_item_name(world: CrimDawnWorld) -> str:
     fillerType = world.random.choice(["weapon", "upgrade"])
     if fillerType == "weapon": item = fillerItemDict[world.random.randint(300, 304)]
-    elif fillerType == "upgrade": item = fillerItemDict[world.random.randint(305, 307)]
+    elif fillerType == "upgrade": item = fillerItemDict[307]
 
     itemId = ITEM_NAME_TO_ID[item.name]
 
