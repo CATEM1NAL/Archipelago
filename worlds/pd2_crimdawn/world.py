@@ -39,10 +39,7 @@ class CrimDawnWorld(World):
     origin_region_name = "Crime.net"
 
     def generate_early(self) -> None:
-        self.maxTimeBonuses = round((self.options.run_length.value * 15) / self.options.progression_pacing.value) - 1
-        # run_length * 15 = 60 (4 heists) or 90 (6 heists)
-        # (minutes / pacing) - 1 = items needed to hit run_length
-        self.itemsForGoal = int((self.options.run_length.value * 10) / self.options.progression_pacing.value - 1)
+        self.itemsForGoal = round((self.options.run_length.value * 15) / self.options.progression_pacing.value - 1)
 
         if self.options.biglobby == 0:
             self.botCount = 3

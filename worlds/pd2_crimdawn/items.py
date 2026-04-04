@@ -62,8 +62,8 @@ class CrimDawnItem(Item):
     game = "PAYDAY 2: Criminal Dawn"
 
 def update_items(world: CrimDawnWorld) -> None:
-    progressionItemDict[1] = itemData(itemDict[1][0], world.maxTimeBonuses, *itemDict[1][2:])
-    world.logger.info(f"{world.player_name} has {world.maxTimeBonuses} Time Bonuses.")
+    progressionItemDict[1] = itemData(itemDict[1][0], world.itemsForGoal, *itemDict[1][2:])
+    world.logger.info(f"{world.player_name} has {world.itemsForGoal} Time Bonuses.")
     progressionItemDict[3] = itemData(itemDict[3][0], world.botCount, *itemDict[3][2:])
     progressionItemDict[4] = itemData(itemDict[4][0], world.options.saws, *itemDict[4][2:])
 
