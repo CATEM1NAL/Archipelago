@@ -29,7 +29,7 @@ class GamePace(Choice):
 class InfiniteTime(DefaultOnToggle):
     """
     Generate an additional time bonus at the final score check.
-    After obtaining every time bonus the PONR timer is disabled.
+    After obtaining every time bonus the timer is disabled.
     """
 
     display_name = "Infinite Time"
@@ -54,6 +54,9 @@ class RunLength(Choice):
 class ScoreLocations(Range):
     """
     How many checks are locked behind score requirements.
+    This scales heavily, so be careful about how you set this!
+    (5050 points for 100 checks, 7260 points for 120 checks,
+    11325 points for 150 checks, 80200 points for 400 checks)
     """
 
     display_name = "Score Checks"
@@ -181,7 +184,6 @@ class DeathLink(Toggle):
     """
 
     display_name = "Death Link"
-
 
 @dataclass
 class CrimDawnOptions(PerGameCommonOptions):
