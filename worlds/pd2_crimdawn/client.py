@@ -199,11 +199,21 @@ class CrimDawnContext(CommonContext):
                 tier = 1
                 count = 0
 
+                itemTypeLookup = {
+                    0: "Boring.",
+                    1: "This seems important!",
+                    2: "This seems useful.",
+                    3: "This seems very important!",
+                    4: "This seems dangerous...",
+                    5: "This seems important, but also dangerous.",
+                    6: "This seems useful, but also dangerous.",
+                    7: "This seems very important, but also dangerous.",
+                }
                 rooms = {}
                 for NetworkItem in args["locations"]:
                     playerName = self.player_names[NetworkItem.player]
                     itemName = self.item_names.lookup_in_slot(NetworkItem.item, NetworkItem.player)
-                    itemHint = f"{playerName}'s ##{itemName}##."
+                    itemHint = f"{playerName}'s ##{itemName}##.\n{itemTypeLookup[NetworkItem.flags]}"
 
                     rooms[f"{self.safehouseIdToName[keys[count]].descId}_{tier}"] = itemHint
                     count += 1

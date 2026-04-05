@@ -8,7 +8,7 @@ class GamePace(Choice):
     The speed at which the world can be played. Slower speeds are more likely to get stuck.
 
     QUICK: Start with 20 minutes, gain 20 with each time bonus.
-    With 100 score checks and 4 heists this can take around ?? hours to goal.
+    With 100 score checks and 4 heists this can take around 8 hours to goal.
 
     STANDARD: Start with 10 minutes, gain 10 with each time bonus.
     With default settings this can take around 12 hours to goal.
@@ -158,10 +158,10 @@ class MaxDiff(Choice):
     The highest difficulty your run can reach.
 
     This mod can get quite hard as you aren't guaranteed to have a good build,
-    and the total number of upgrades is less than you would normally have.
+    but late game you can get INCREDIBLY powerful builds that make high difficulties trivial.
 
-    If you're unsure of what to set this to, I'd recommend trying the difficulty
-    below the highest you can comfortably play normally.
+    If you're unsure of what to set this to, I'd recommend starting with
+    the difficulty below the highest you can comfortably play normally.
     """
 
     display_name = "Final Difficulty"
