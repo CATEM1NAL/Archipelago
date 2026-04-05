@@ -49,7 +49,10 @@ def create_and_connect_regions(world: CrimDawnWorld) -> None:
         heistRegion.locations.append(location)
 
         if i == 1:
-            itemsForConnection = math.floor(10 / world.options.progression_pacing.value - 0.5)
+            if world.options.run_length < 6:
+                itemsForConnection = math.floor(15 / world.options.progression_pacing.value - 0.5)
+            else:
+                itemsForConnection = math.floor(10 / world.options.progression_pacing.value - 0.5)
             world.create_entrance(crimenet, heistRegion, Has("Time Bonus", itemsForConnection),"Start Run")
             #world.create_entrance(crimenet, heistRegion, None, "Start Run")
         else: #Create Entrance connecting the heist region to the previous heist region
@@ -127,9 +130,9 @@ def create_score_locations(world: CrimDawnWorld) -> None:
 
             locationRule = HasAllCounts({"Time Bonus": timeBonuses,
                                          "Extra Bot": bots,
-                                         "Perma-Perk": i // (world.options.score_checks // world.options.run_length.value),
-                                         "Perma-Skill": i // (world.options.score_checks // world.options.run_length.value)})
-            print(f"{locName}: {locationRule}")
+                                         "Perma-Perk": i // (world.options.score_checks // 7),
+                                         "Perma-Skill": i // (world.options.score_checks // 7)})
+            #print(f"{locName}: {locationRule}")
 
             world.set_rule(location, locationRule)
 
