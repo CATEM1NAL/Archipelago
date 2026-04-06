@@ -44,7 +44,7 @@ class CrimDawnWorld(World):
         if self.options.biglobby == 0:
             self.botCount = 3
         else:
-            self.botCount = self.random.randint(4,21)
+            self.botCount = self.random.randint(7,21)
 
     def create_regions(self) -> None:
         locations.create_and_connect_regions(self)

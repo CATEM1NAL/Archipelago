@@ -68,7 +68,7 @@ class ScoreLocations(Range):
 class BotCount(Toggle):
     """
     Whether BigLobby is installed. Recommended to increase score checks by about 20.
-    Enabling this increases the number of extra bots from 3 to a number between 4 and 21,
+    Enabling this increases the number of extra bots from 3 to a number between 7 and 21,
     however the game may become less stable:
     https://modworkshop.net/mod/21582
     """
