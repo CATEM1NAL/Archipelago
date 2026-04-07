@@ -120,7 +120,8 @@ def create_score_locations(world: CrimDawnWorld) -> None:
 
             elif i == world.options.score_checks:
                 timeBonuses = round(world.itemsForGoal)
-                if world.options.infinite_time: location.place_locked_item(world.create_item("Time Bonus"))
+                if world.options.infinite_time:
+                    location.place_locked_item(world.create_item("Time Bonus"))
 
             else:
                 timeBonuses = 0
