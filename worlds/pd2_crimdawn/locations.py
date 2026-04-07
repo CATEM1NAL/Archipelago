@@ -111,22 +111,21 @@ def create_score_locations(world: CrimDawnWorld) -> None:
             firstHeist.connect(region, "1 point")
 
         else:
-            if i < 4 * (world.options.score_checks / max(world.itemsForGoal - 1, 1)):
+            #if i < 4 * (world.options.score_checks / max(world.itemsForGoal - 1, 1)):
+            if i < world.options.score_checks:
                 timeBonuses = round(i / (world.options.score_checks / max(world.itemsForGoal - 1, 1)))
-                requiredTimeBonuses.update({triangle(i): timeBonuses})
 
-            elif 4 * (world.options.score_checks / max(world.itemsForGoal - 1, 1)) <= i < world.options.score_checks:
-                timeBonuses =  round(i / (world.options.score_checks / max(world.itemsForGoal - 1, 1)))
-                requiredTimeBonuses.update({triangle(i): timeBonuses})
+            #elif 4 * (world.options.score_checks / max(world.itemsForGoal - 1, 1)) <= i < world.options.score_checks:
+            #    timeBonuses =  round(i / (world.options.score_checks / max(world.itemsForGoal - 1, 1)))
 
             elif i == world.options.score_checks:
                 timeBonuses = round(world.itemsForGoal)
-                requiredTimeBonuses.update({triangle(i): timeBonuses})
-                if world.options.infinite_time == 1: location.place_locked_item(world.create_item("Time Bonus"))
+                if world.options.infinite_time: location.place_locked_item(world.create_item("Time Bonus"))
 
             else:
                 timeBonuses = 0
-                requiredTimeBonuses.update({triangle(i): 0})
+
+            requiredTimeBonuses.update({triangle(i): timeBonuses})
 
             locationRule = HasAllCounts({"Time Bonus": timeBonuses,
                                          "Extra Bot": bots,
@@ -149,6 +148,7 @@ def create_score_locations(world: CrimDawnWorld) -> None:
             required += 1
         prevScore = score
     world.locationToScoreCap.append(triangle(world.options.score_checks))
+    print(world.locationToScoreCap)
 
     location = world.get_location(f"Heist {world.options.run_length.value} Completed")
     locationRule = HasAllCounts({"Time Bonus": world.itemsForGoal,
