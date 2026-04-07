@@ -202,7 +202,7 @@ class CrimDawnContext(CommonContext):
                 itemTypeLookup = {
                     0: "Boring.",
                     1: "This seems important!",
-                    2: "This seems useful.",
+                    2: "This seems useful!",
                     3: "This seems very important!",
                     4: "This seems dangerous...",
                     5: "This seems important, but also dangerous.",
