@@ -256,7 +256,7 @@ class CrimDawnContext(CommonContext):
 
         # Check seed
         self.scribble.writeVariable("seed", args['slot_data']['seed_name'])
-        print(f"Wrote seed to client file")
+        print("Wrote seed to client file")
 
         try:
             modSave = load_json_file(self.path + "crimdawn_save.txt")
