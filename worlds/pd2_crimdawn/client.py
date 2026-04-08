@@ -25,7 +25,7 @@ def load_json_file(fileName: str) -> dict:
 
 class CrimDawnCommandProcessor(ClientCommandProcessor):
     def _cmd_score(self):
-        """Displays your current score."""
+        """See your current score and progress to next check."""
         if isinstance(self.ctx, CrimDawnContext):
             nextScoreCheck = triangle(self.ctx.n + 1)
             logger.info(f"Current score: {self.ctx.score}/{nextScoreCheck}")
