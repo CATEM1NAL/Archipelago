@@ -5,7 +5,7 @@ try:
 except ModuleNotFoundError:
     from CommonClient import CommonContext
 from CommonClient import ClientCommandProcessor, server_loop, get_base_parser, handle_url_arg, logger
-import Utils, asyncio, colorama, logging, json, os, math, time, random
+import Utils, asyncio, colorama, logging, json, os, shutil, math, time, random
 from . import CrimDawnWorld, items
 from .data_structs import safeHouseData
 from collections.abc import Sequence
@@ -263,6 +263,7 @@ class CrimDawnContext(CommonContext):
 
             try:
                 modSeed = modSave["game"]["seed"]
+                modSlot = modSeed = modSave["game"]["slot"]
             except (KeyError):
                 modSeed = False
 
@@ -270,17 +271,43 @@ class CrimDawnContext(CommonContext):
             print(f"Couldn't load crimdawn_save.txt: {e}")
 
         try:
-            if modSeed != args['slot_data']['seed_name'] and modSeed != False:
-                logger.error("ERROR: Your Criminal Dawn save was made on a different seed.\n"
-                             "Only one multiworld can currently be played at a time.\n\n"
-                             "Delete your save with the following steps:\n"
-                             "1) Launch PAYDAY 2.\n"
-                             "2) Click 'OPTIONS'.\n"
-                             "3) Click 'ADVANCED'.\n"
-                             "4) Click 'RESET MULTIWORLD DATA'.\n"
-                             "5) Click 'YES' and wait for the game to reload.\n\n"
-                             "You can reconnect after the game finishes reloading.")
-                Utils.async_start(self.disconnect())
+            if (modSeed != args['slot_data']['seed_name'] and modSeed != False) or (modSlot != args['slot_data']['player_name'] and modSlot != False):
+                try:
+                    os.mkdir(self.path + "crimdawn_saves")
+                except:
+                    pass
+
+                try:
+                    shutil.copy2(self.path + "crimdawn_save.txt", self.path + "crimdawn_saves/" + f"{modSeed}_{modSlot}")
+                    saveUpdated = False
+                    for save in os.listdir(self.path + "crimdawn_saves"):
+                        if save == f"{args['slot_data']['seed_name']}_{args['slot_data']['player_name']}":
+                            shutil.copy2(self.path + "crimdawn_saves/" + f"{args['slot_data']['seed_name']}_{args['slot_data']['player_name']}", self.path + "crimdawn_save.txt")
+                            logger.info("Successfully found and restored old save!\n"
+                                        "Previous save was moved to 'PAYDAY 2/mods/saves/crimdawn_saves' - clear this folder from time to time.\n"
+                                        "If the game is currently open, you will need to restart it.")
+                            saveUpdated = True
+                        if saveUpdated:
+                            break
+
+                    if not saveUpdated:
+                        os.remove(self.path + "crimdawn_save.txt")
+                        logger.info("No pre-existing save found for this slot.\n"
+                                    "Previous save was moved to 'PAYDAY 2/mods/saves/crimdawn_saves' - clear this folder from time to time.\n"
+                                    "If the game is currently open, you will need to restart it.")
+
+                    os.remove(self.path + "crimdawn_rooms.txt")
+
+                except:
+                    logger.error("ERROR: Your Criminal Dawn save was made on a different seed.\n\n"
+                                 "Delete your save with the following steps:\n"
+                                 "1) Launch PAYDAY 2.\n"
+                                 "2) Click 'OPTIONS'.\n"
+                                 "3) Click 'ADVANCED'.\n"
+                                 "4) Click 'RESET MULTIWORLD DATA'.\n"
+                                 "5) Click 'YES' and wait for the game to reload.\n\n"
+                                 "You can reconnect after the game finishes reloading.")
+                    Utils.async_start(self.disconnect())
 
         except:
             pass
@@ -296,12 +323,14 @@ class CrimDawnContext(CommonContext):
         self.runLength = args['slot_data']['run_length']
         self.finalDifficulty = args['slot_data']['final_difficulty']
         self.diffScale = args['slot_data']['diff_scale_count']
+        self.playerName = args['slot_data']['player_name']
 
         self.scribble.writeVariable("timer_strength", self.timerStrength)
         self.scribble.writeVariable("run_length", self.runLength)
         self.scribble.writeVariable("max_diff", self.finalDifficulty)
         self.scribble.writeVariable("score_cap", self.scoreCaps[self.timeBonusReceived])
-        self.scribble.writeVariable("scaling_count", self.diffScale)
+        self.scribble.writeVariable("max_diff_items", self.diffScale)
+        self.scribble.writeVariable("slot", self.playerName)
 
         self.deathLinkEnabled = args['slot_data']["death_link"]
         if self.deathLinkEnabled:
