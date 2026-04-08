@@ -131,7 +131,7 @@ class MeleeCount(Range):
     """
     The base number of melee weapons the multiworld will try to generate.
     Actual number may be higher or lower depending on the number of locations available.
-    19 is the most you can have without DLC - extra items will do nothing.
+    19 is the most you can have without DLC or achievements - extra items will do nothing.
     """
 
     display_name = "Melee Weapons"
