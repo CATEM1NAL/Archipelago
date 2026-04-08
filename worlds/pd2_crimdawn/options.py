@@ -92,13 +92,13 @@ class PrimaryCount(Range):
     """
     The base number of primary weapons the multiworld will try to generate.
     Actual number may be higher or lower depending on the number of locations available.
-    19 is the most you can have without DLC - extra items will do nothing.
+    20 is the most you can have without DLC - extra items will do nothing.
     """
 
     display_name = "Primary Weapons"
 
     range_start = 0
-    range_end = 73
+    range_end = 77
     default = 10
 
 class AkimboCount(Range):
@@ -111,20 +111,20 @@ class AkimboCount(Range):
     display_name = "Akimbos"
 
     range_start = 0
-    range_end = 57
+    range_end = 58
     default = 5
 
 class SecondaryCount(Range):
     """
     The base number of secondary weapons the multiworld will try to generate.
     Actual number may be higher or lower depending on the number of locations available.
-    24 is the most you can have without DLC - extra items will do nothing.
+    31 is the most you can have without DLC - extra items will do nothing.
     """
 
     display_name = "Secondary Weapons"
 
     range_start = 0
-    range_end = 67
+    range_end = 78
     default = 10
 
 class MeleeCount(Range):
@@ -137,27 +137,27 @@ class MeleeCount(Range):
     display_name = "Melee Weapons"
 
     range_start = 0
-    range_end = 87
+    range_end = 94
     default = 5
 
 class ThrowableCount(Range):
     """
     The base number of throwables the multiworld will try to generate.
     Actual number may be higher or lower depending on the number of locations available.
-    6 is the most you can have without DLC - extra items will do nothing.
+    5 is the most you can have without DLC or achievements - extra items will do nothing.
     """
 
     display_name = "Throwables"
 
     range_start = 0
-    range_end = 10
+    range_end = 15
     default = 5
 
 class MaxDiff(Choice):
     """
     The highest difficulty your run can reach.
 
-    This mod can get quite hard as you aren't guaranteed to have a good build,
+    This mod can be quite hard early-mid game as you aren't guaranteed to have a good build,
     but late game you can get INCREDIBLY powerful builds that make high difficulties trivial.
 
     If you're unsure of what to set this to, I'd recommend starting with
@@ -178,9 +178,9 @@ class MaxDiff(Choice):
 
 class DeathLink(Toggle):
     """
-    Death links are sent every time a heist is failed.
+    Death links are sent when a heist is failed.
     After receiving a death link you will lose a down the next time you take damage.
-    In a multiplayer session only the lobby host can send death links to avoid spam.
+    In a multiplayer session only the lobby host can send death links to prevent spam.
     """
 
     display_name = "Death Link"
