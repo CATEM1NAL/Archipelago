@@ -25,10 +25,12 @@ def load_json_file(fileName: str) -> dict:
 
 class CrimDawnCommandProcessor(ClientCommandProcessor):
     def _cmd_score(self):
-        """Displays your current score."""
+        """See your current score and progress to next check."""
         if isinstance(self.ctx, CrimDawnContext):
             nextScoreCheck = triangle(self.ctx.n + 1)
-            logger.info(f"Current score: {self.ctx.score}/{nextScoreCheck}")
+            logger.info(f"Current score: {self.ctx.score}/{self.ctx.scoreCaps[self.ctx.timeBonusReceived]}. "
+                        f"Next check at {nextScoreCheck} points ({nextScoreCheck - self.ctx.score} more).\n"
+                        f"Sent {100 * (self.ctx.score / self.ctx.scoreCaps[-1]):.2f}% of total score checks.")
 
 # scribble likes to write
 class scribble:
@@ -63,12 +65,20 @@ class scrungle:
         prevRun = -1
         lastChatTime = math.floor(time.time())
         lastModTime = 0
-        deathMsgs = ["left their favourite cassette in the escape car.",
-                     "needs to get their head examined.",
-                     "learned that crime doesn't pay.",
-                     "watched dawn turn to dusk.",
-                     "doesn't have a razor mind.",
-                     "got caught up in that Kataru business."]
+        slotName = self.context.player_names[self.context.slot]
+        funnyWeapons = ["HRL-7", "Heavy Crossbow", "SG Versteckt 51D Light Machine Gun", "Two Handed Great Ruler",
+                        "Cash Blaster", "Inspector Gadget Character Pack", "backing of an entire nation state"]
+        deathMsgs = [f"{slotName} left their favourite cassette in the escape car.",
+                     f"{slotName} needs to get their head examined.",
+                     f"{slotName} learned that crime doesn't pay.",
+                     f"{slotName} watched dawn turn to dusk.",
+                     f"{slotName} doesn't have a razor mind.",
+                     f"{slotName} got caught up in that Kataru business.",
+                     f"The escape van left {slotName} behind.",
+                     f"{slotName} was overwhelmed by DLC.",
+                     f"Scrungle found {slotName}. Nobody escapes Scrungle.",
+                     f"It's not {slotName}'s fault, they just had a bad build.",
+                     f"If {slotName} had the {random.choice(funnyWeapons)}, that wouldn't have happened."]
 
         print(f"Scrungle is watching {self.path}...")
 
@@ -104,7 +114,7 @@ class scrungle:
                             # Send deathlink
                             if prevRun < run:
                                 prevRun = run
-                                await self.context.send_death(f"{self.context.player_names[self.context.slot]} {random.choice(deathMsgs)}")
+                                await self.context.send_death(random.choice(deathMsgs))
 
                         except (FileNotFoundError, json.decoder.JSONDecodeError) as e:
                             print(f"Couldn't load crimdawn_save.txt: {e}")
@@ -301,7 +311,7 @@ class CrimDawnContext(CommonContext):
                         msg = "Successfully found and restored old save!"
                         break
 
-                logger.info(f"{msg}\nPrevious save was moved to 'PAYDAY 2/mods/saves/crimdawn_saves' - clear this folder from time to time.\n"
+                logger.info(f"{msg}\nPrevious save was moved to 'PAYDAY 2/mods/saves/crimdawn_saves' - you should clear this folder out from time to time!\n"
                                 "If the game is currently open, you will need to restart it.")
 
             except Exception as e: # If save handler fails, fallback to old error
@@ -311,7 +321,7 @@ class CrimDawnContext(CommonContext):
                              "1) Launch PAYDAY 2.\n"
                              "2) Click 'OPTIONS'.\n"
                              "3) Click 'ADVANCED'.\n"
-                             "4) Click 'RESET MULTIWORLD DATA'.\n"
+                             "4) Click 'RESET ACCOUNT PROGRESSION'.\n"
                              "5) Click 'YES' and wait for the game to reload.\n\n"
                              "You can reconnect after the game finishes reloading.")
             # If you see this error then something has gone horribly wrong. Tell me about it!
@@ -323,10 +333,12 @@ class CrimDawnContext(CommonContext):
         self.itemDict = items.itemDict
 
         print()
+
+        self.runLength = args['slot_data']['run_length']
         self.scoreCaps = args['slot_data']["score_caps"]
 
         self.scribble.writeVariable("timer_strength", args['slot_data']['progression_pacing'])
-        self.scribble.writeVariable("run_length", args['slot_data']['run_length'])
+        self.scribble.writeVariable("run_length", self.runLength)
         self.scribble.writeVariable("max_diff", args['slot_data']['final_difficulty'])
         self.scribble.writeVariable("score_cap", self.scoreCaps[self.timeBonusReceived])
         self.scribble.writeVariable("max_diff_items", args['slot_data']['diff_scale_count'])
@@ -338,6 +350,7 @@ class CrimDawnContext(CommonContext):
 
         keys = list(self.safehouseIdToName)
         self.safehouseRooms = []
+
         for i in range(1, self.runLength + 1):
             for j in range(23):
                 self.safehouseRooms.append(LOCATION_NAME_TO_ID[f"{self.safehouseIdToName[keys[j]].name} (Tier {i})"])
