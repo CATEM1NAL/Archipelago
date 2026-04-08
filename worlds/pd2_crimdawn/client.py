@@ -263,26 +263,34 @@ class CrimDawnContext(CommonContext):
 
             try:
                 modSeed = modSave["game"]["seed"]
-                modSlot = modSave["game"]["slot"]
             except (KeyError):
                 modSeed = False
+
+            try:
+                modSlot = modSave["game"]["slot"]
+            except (KeyError):
+                modSlot = False
 
         except (FileNotFoundError, json.decoder.JSONDecodeError) as e:
             print(f"Couldn't load crimdawn_save.txt: {e}")
 
         try: # Switch saves automatically if the seed/slot names don't match
-            if (modSeed and modSeed != args['slot_data']['seed_name']) or (modSlot and modSlot != args['slot_data']['player_name']):
+            if (modSeed and modSeed != args['slot_data']['seed_name']) or (modSlot and modSlot != self.player_names[self.slot]):
                 try:
                     os.mkdir(self.path + "crimdawn_saves")
                 except:
                     pass
 
                 try:
-                    shutil.copy2(self.path + "crimdawn_save.txt", self.path + "crimdawn_saves/" + f"{modSeed}_{modSlot}")
+                    modSave = f"{modSeed}_{modSlot}"
+                    targetSave = f"{args['slot_data']['seed_name']}_{self.player_names[self.slot]}"
+
+                    shutil.copy2(self.path + "crimdawn_save.txt", self.path + "crimdawn_saves/" + modSave)
                     saveUpdated = False
+
                     for save in os.listdir(self.path + "crimdawn_saves"):
-                        if save == f"{args['slot_data']['seed_name']}_{args['slot_data']['player_name']}":
-                            shutil.copy2(self.path + "crimdawn_saves/" + f"{args['slot_data']['seed_name']}_{args['slot_data']['player_name']}", self.path + "crimdawn_save.txt")
+                        if save == targetSave:
+                            shutil.copy2(self.path + "crimdawn_saves/" + targetSave, self.path + "crimdawn_save.txt")
                             logger.info("Successfully found and restored old save!\n"
                                         "Previous save was moved to 'PAYDAY 2/mods/saves/crimdawn_saves' - clear this folder from time to time.\n"
                                         "If the game is currently open, you will need to restart it.")
@@ -319,19 +327,15 @@ class CrimDawnContext(CommonContext):
 
         self.itemDict = items.itemDict
 
+        print()
         self.scoreCaps = args['slot_data']["score_caps"]
-        self.timerStrength = args['slot_data']['progression_pacing']
-        self.runLength = args['slot_data']['run_length']
-        self.finalDifficulty = args['slot_data']['final_difficulty']
-        self.diffScale = args['slot_data']['diff_scale_count']
-        self.playerName = args['slot_data']['player_name']
 
-        self.scribble.writeVariable("timer_strength", self.timerStrength)
-        self.scribble.writeVariable("run_length", self.runLength)
-        self.scribble.writeVariable("max_diff", self.finalDifficulty)
+        self.scribble.writeVariable("timer_strength", args['slot_data']['progression_pacing'])
+        self.scribble.writeVariable("run_length", args['slot_data']['run_length'])
+        self.scribble.writeVariable("max_diff", args['slot_data']['final_difficulty'])
         self.scribble.writeVariable("score_cap", self.scoreCaps[self.timeBonusReceived])
-        self.scribble.writeVariable("max_diff_items", self.diffScale)
-        self.scribble.writeVariable("slot", self.playerName)
+        self.scribble.writeVariable("max_diff_items", args['slot_data']['diff_scale_count'])
+        self.scribble.writeVariable("slot", self.player_names[self.slot])
 
         self.deathLinkEnabled = args['slot_data']["death_link"]
         if self.deathLinkEnabled:
