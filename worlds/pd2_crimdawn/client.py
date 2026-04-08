@@ -9,7 +9,7 @@ import Utils, asyncio, colorama, logging, json, os, shutil, math, time, random
 from . import CrimDawnWorld, items
 from .data_structs import safeHouseData
 from collections.abc import Sequence
-from .locations import LOCATION_NAME_TO_ID
+from .locations import LOCATION_NAME_TO_ID, triangle
 
 from BaseClasses import ItemClassification as IC
 from NetUtils import ClientStatus
@@ -20,21 +20,22 @@ def load_json_file(fileName: str) -> dict:
     try:
         with open(fileName, 'r', encoding='utf-8') as file:
             return json.load(file)
-    except Exception as e:
+    except FileNotFoundError:
         return {}
 
 class CrimDawnCommandProcessor(ClientCommandProcessor):
-    def _score(self):
+    def _cmd_score(self):
         """Displays your current score."""
         if isinstance(self.ctx, CrimDawnContext):
-            logger.info(f"Current score: {1}")
+            nextScoreCheck = triangle(self.ctx.n + 1)
+            logger.info(f"Current score: {self.ctx.score}/{nextScoreCheck}")
 
 # scribble likes to write
 class scribble:
     def __init__(self, path):
         self.data = {}
         self.path = path
-        print(f"Scribble is scribing {self.path}...")
+        print(f"Scribble is scriblibling {self.path}...")
 
     def run(self, key):
         try:
@@ -146,6 +147,7 @@ class CrimDawnContext(CommonContext):
     def __init__(self, server_address, password):
         super().__init__(server_address, password)
         self.score = 0
+        self.n = 0
         self.scrungle_task = None
         self.deathLinkPending = False
         self.createRoomLoc = False
@@ -247,79 +249,69 @@ class CrimDawnContext(CommonContext):
         self.scribble = scribble(self.path + "crimdawn_client.txt")
 
         if not os.path.isfile(CrimDawnWorld.settings.payday2_path):
-            logger.error('ERROR: Scrungle no find payday2_win32_release.exe.\nScrungle kindly requests that you remove payday2_path from host.yaml')
-            Utils.async_start(self.disconnect())
+            raise Exception('ERROR: Scrungle no find payday2_win32_release.exe.\nScrungle kindly requests that you remove payday2_path from host.yaml')
 
         elif not os.path.exists(self.path):
-            logger.error('ERROR: Scrungle no find /mods/saves.\nScrungle want you to check that you have SuperBLT installed.')
-            Utils.async_start(self.disconnect())
+            raise Exception('ERROR: Scrungle no find /mods/saves.\nScrungle want you to check that you have SuperBLT installed.')
 
         # Check seed
         self.scribble.writeVariable("seed", args['slot_data']['seed_name'])
         print("Wrote seed to client file")
+
+        modSeed, modSlot = False, False
 
         try:
             modSave = load_json_file(self.path + "crimdawn_save.txt")
 
             try:
                 modSeed = modSave["game"]["seed"]
-            except (KeyError):
-                modSeed = False
+            except KeyError:
+                pass
 
             try:
                 modSlot = modSave["game"]["slot"]
-            except (KeyError):
-                modSlot = False
+            except KeyError:
+                pass
 
         except (FileNotFoundError, json.decoder.JSONDecodeError) as e:
             print(f"Couldn't load crimdawn_save.txt: {e}")
 
-        try: # Switch saves automatically if the seed/slot names don't match
-            if (modSeed and modSeed != args['slot_data']['seed_name']) or (modSlot and modSlot != self.player_names[self.slot]):
-                try:
-                    os.mkdir(self.path + "crimdawn_saves")
-                except:
-                    pass
+        # Switch saves automatically if the seed/slot names don't match
+        if (modSeed and modSeed != args['slot_data']['seed_name']) or (modSlot and modSlot != self.player_names[self.slot]):
+            try:
+                os.mkdir(self.path + "crimdawn_saves")
+            except FileExistsError:
+                pass
 
-                try:
-                    modSave = f"{modSeed}_{modSlot}"
-                    targetSave = f"{args['slot_data']['seed_name']}_{self.player_names[self.slot]}"
+            try:
+                saveName = f"{modSeed}_{modSlot}"
+                targetSave = f"{args['slot_data']['seed_name']}_{self.player_names[self.slot]}"
 
-                    shutil.copy2(self.path + "crimdawn_save.txt", self.path + "crimdawn_saves/" + modSave)
-                    saveUpdated = False
+                shutil.copy2(self.path + "crimdawn_save.txt", self.path + "crimdawn_saves/" + saveName)
+                os.remove(self.path + "crimdawn_save.txt")
+                os.remove(self.path + "crimdawn_rooms.txt")
 
-                    for save in os.listdir(self.path + "crimdawn_saves"):
-                        if save == targetSave:
-                            shutil.copy2(self.path + "crimdawn_saves/" + targetSave, self.path + "crimdawn_save.txt")
-                            logger.info("Successfully found and restored old save!\n"
-                                        "Previous save was moved to 'PAYDAY 2/mods/saves/crimdawn_saves' - clear this folder from time to time.\n"
-                                        "If the game is currently open, you will need to restart it.")
-                            saveUpdated = True
-                        if saveUpdated:
-                            break
+                msg = "No pre-existing save found for this slot."
+                for save in os.listdir(self.path + "crimdawn_saves"):
+                    if save == targetSave:
+                        shutil.copy2(self.path + "crimdawn_saves/" + targetSave, self.path + "crimdawn_save.txt")
+                        msg = "Successfully found and restored old save!"
+                        break
 
-                    if not saveUpdated:
-                        os.remove(self.path + "crimdawn_save.txt")
-                        logger.info("No pre-existing save found for this slot.\n"
-                                    "Previous save was moved to 'PAYDAY 2/mods/saves/crimdawn_saves' - clear this folder from time to time.\n"
-                                    "If the game is currently open, you will need to restart it.")
+                logger.info(f"{msg}\nPrevious save was moved to 'PAYDAY 2/mods/saves/crimdawn_saves' - clear this folder from time to time.\n"
+                                "If the game is currently open, you will need to restart it.")
 
-                    os.remove(self.path + "crimdawn_rooms.txt")
-
-                except: # If save handler fails, fallback to old error
-                    logger.error("ERROR: Your Criminal Dawn save was made on a different seed.\n\n"
-                                 "Delete your save with the following steps:\n"
-                                 "1) Launch PAYDAY 2.\n"
-                                 "2) Click 'OPTIONS'.\n"
-                                 "3) Click 'ADVANCED'.\n"
-                                 "4) Click 'RESET MULTIWORLD DATA'.\n"
-                                 "5) Click 'YES' and wait for the game to reload.\n\n"
-                                 "You can reconnect after the game finishes reloading.")
-                    Utils.async_start(self.disconnect())
-                # If you see this error then something has gone horribly wrong. Tell me about it!
-
-        except:
-            pass
+            except Exception as e: # If save handler fails, fallback to old error
+                logger.error(e)
+                raise Exception("ERROR: Your Criminal Dawn save was made on a different seed.\n\n"
+                             "Delete your save with the following steps:\n"
+                             "1) Launch PAYDAY 2.\n"
+                             "2) Click 'OPTIONS'.\n"
+                             "3) Click 'ADVANCED'.\n"
+                             "4) Click 'RESET MULTIWORLD DATA'.\n"
+                             "5) Click 'YES' and wait for the game to reload.\n\n"
+                             "You can reconnect after the game finishes reloading.")
+            # If you see this error then something has gone horribly wrong. Tell me about it!
 
         if not self.scrungle_task:
             self.scrungle = scrungle(self.path + "crimdawn_save.txt", self)
@@ -366,6 +358,7 @@ class CrimDawnContext(CommonContext):
                 logger.error(f"KEY ERROR: {entry.item}")
                 continue
             except Exception as e:
+                logger.error(e)
                 logger.error(f"FATAL ERROR: {entry.item}")
                 continue
 
@@ -381,13 +374,13 @@ class CrimDawnContext(CommonContext):
                     self.scribble.writeVariable("score_cap", self.scoreCaps[-1])
 
     def getN(self, score):
-        return math.floor((math.sqrt(1 + 8 * (score)) - 1) / 2)
+        return math.floor((math.sqrt(1 + 8 * score) - 1) / 2)
 
     async def score_check(self, score):
         try:
             # Solve triangular number
-            n = self.getN(score)
-            for i in range(1, n + 1):
+            self.n = self.getN(score)
+            for i in range(1, self.n + 1):
                 if i in self.missing_locations:
                     await self.check_locations([i])
 
