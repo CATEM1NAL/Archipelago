@@ -270,7 +270,7 @@ class CrimDawnContext(CommonContext):
         except (FileNotFoundError, json.decoder.JSONDecodeError) as e:
             print(f"Couldn't load crimdawn_save.txt: {e}")
 
-        try:
+        try: # Switch saves automatically if the seed/slot names don't match
             if (modSeed and modSeed != args['slot_data']['seed_name']) or (modSlot and modSlot != args['slot_data']['player_name']):
                 try:
                     os.mkdir(self.path + "crimdawn_saves")
@@ -298,7 +298,7 @@ class CrimDawnContext(CommonContext):
 
                     os.remove(self.path + "crimdawn_rooms.txt")
 
-                except:
+                except: # If we can't switch saves for some reason, fallback to old error
                     logger.error("ERROR: Your Criminal Dawn save was made on a different seed.\n\n"
                                  "Delete your save with the following steps:\n"
                                  "1) Launch PAYDAY 2.\n"
@@ -308,6 +308,7 @@ class CrimDawnContext(CommonContext):
                                  "5) Click 'YES' and wait for the game to reload.\n\n"
                                  "You can reconnect after the game finishes reloading.")
                     Utils.async_start(self.disconnect())
+                # If you do see this, something has gone horribly wrong. Tell me about it!
 
         except:
             pass
