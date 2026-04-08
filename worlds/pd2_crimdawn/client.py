@@ -271,7 +271,7 @@ class CrimDawnContext(CommonContext):
             print(f"Couldn't load crimdawn_save.txt: {e}")
 
         try:
-            if (modSeed != args['slot_data']['seed_name'] and modSeed != False) or (modSlot != args['slot_data']['player_name'] and modSlot != False):
+            if (modSeed != args['slot_data']['seed_name'] and not(modSeed)) or (modSlot != args['slot_data']['player_name'] and not(modSlot)):
                 try:
                     os.mkdir(self.path + "crimdawn_saves")
                 except:
