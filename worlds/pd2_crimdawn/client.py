@@ -298,7 +298,7 @@ class CrimDawnContext(CommonContext):
 
                     os.remove(self.path + "crimdawn_rooms.txt")
 
-                except: # If we can't switch saves for some reason, fallback to old error
+                except: # If save handler fails, fallback to old error
                     logger.error("ERROR: Your Criminal Dawn save was made on a different seed.\n\n"
                                  "Delete your save with the following steps:\n"
                                  "1) Launch PAYDAY 2.\n"
@@ -308,7 +308,7 @@ class CrimDawnContext(CommonContext):
                                  "5) Click 'YES' and wait for the game to reload.\n\n"
                                  "You can reconnect after the game finishes reloading.")
                     Utils.async_start(self.disconnect())
-                # If you do see this, something has gone horribly wrong. Tell me about it!
+                # If you see this error then something has gone horribly wrong. Tell me about it!
 
         except:
             pass
