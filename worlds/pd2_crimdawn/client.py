@@ -263,7 +263,7 @@ class CrimDawnContext(CommonContext):
 
             try:
                 modSeed = modSave["game"]["seed"]
-                modSlot = modSeed = modSave["game"]["slot"]
+                modSlot = modSave["game"]["slot"]
             except (KeyError):
                 modSeed = False
 
