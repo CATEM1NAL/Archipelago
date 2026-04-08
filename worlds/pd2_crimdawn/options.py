@@ -3,6 +3,16 @@ from dataclasses import dataclass
 from Options import Choice, PerGameCommonOptions, Range, Toggle, OptionGroup, DefaultOnToggle
 
 
+class Goal(Choice):
+    """
+    Goal variants
+    """
+    display_name = "Goal"
+
+    option_classic = 1
+    option_millennial_dream = 2
+
+
 class GamePace(Choice):
     """
     The speed at which the world can be played. Slower speeds are more likely to get stuck.
@@ -187,6 +197,7 @@ class DeathLink(Toggle):
 
 @dataclass
 class CrimDawnOptions(PerGameCommonOptions):
+    goal: Goal
     progression_pacing: GamePace
     run_length: RunLength
     infinite_time: InfiniteTime

@@ -9,7 +9,7 @@ import Utils, asyncio, colorama, logging, json, os, shutil, math, time, random
 from . import CrimDawnWorld, items
 from .data_structs import safeHouseData
 from collections.abc import Sequence
-from .locations import LOCATION_NAME_TO_ID, triangle
+from .locations import LOCATION_NAME_TO_ID, triangle, safehouseRooms
 
 from BaseClasses import ItemClassification as IC
 from NetUtils import ClientStatus
@@ -95,7 +95,7 @@ class scrungle:
                                     print(f"Heist {i} Completed")
                                     heist = LOCATION_NAME_TO_ID[f"Heist {i} Completed"]
                                     await self.context.check_locations([heist])
-                                if heistsWon >= self.context.runLength:
+                                if heistsWon >= self.context.runLength and self.context.goal == "classic":
                                     await self.context.send_msgs([{"cmd": "StatusUpdate", "status": ClientStatus.CLIENT_GOAL}])
                                 prevHeistsWon = heistsWon
 
@@ -276,6 +276,9 @@ class CrimDawnContext(CommonContext):
         except (FileNotFoundError, json.decoder.JSONDecodeError) as e:
             print(f"Couldn't load crimdawn_save.txt: {e}")
 
+        self.goal = args['slot_data']['goal']
+        self.runLength = args['slot_data']['run_length']
+
         # Switch saves automatically if the seed/slot names don't match
         if (modSeed and modSeed != args['slot_data']['seed_name']) or (modSlot and modSlot != self.player_names[self.slot]):
             try:
@@ -396,6 +399,16 @@ class CrimDawnContext(CommonContext):
                     id = LOCATION_NAME_TO_ID[f"{self.safehouseIdToName[key].name} (Tier {i})"]
                     if id in self.missing_locations:
                         await self.check_locations([id])
+
+            if self.goal == "millennial_dream":
+                flag = True
+                for location in self.safehouseLocations:
+                    id = LOCATION_NAME_TO_ID[location]
+                    if id in self.missing_locations:
+                        flag = False
+                        break
+                if flag:
+                    await self.send_msgs([{"cmd": "StatusUpdate", "status": ClientStatus.CLIENT_GOAL}])
 
         except KeyError as e:
             logger.error(f"Safehouse Key Error: {e}")

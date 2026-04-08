@@ -66,7 +66,8 @@ class CrimDawnWorld(World):
             "progression_pacing",
             "run_length",
             "final_difficulty",
-            "death_link"
+            "death_link",
+            "goal"
         )
         args["server_version"] = self.world_version.as_simple_string()
         args["seed_name"] = f"cd_{self.multiworld.seed_name}"

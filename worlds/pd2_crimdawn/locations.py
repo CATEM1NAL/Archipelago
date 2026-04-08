@@ -84,8 +84,8 @@ def create_safe_house(world: CrimDawnWorld) -> None:
             forbid_item(location, "Coins", world.player)
 
 def create_all_locations(world: CrimDawnWorld) -> None:
-    create_score_locations(world)
     create_safe_house(world)
+    create_score_locations(world)
 
 def create_score_locations(world: CrimDawnWorld) -> None:
     # Create regions, assign a location to each region, chain entrances together
@@ -149,7 +149,6 @@ def create_score_locations(world: CrimDawnWorld) -> None:
             required += 1
         prevScore = score
     world.locationToScoreCap.append(triangle(world.options.score_checks))
-    print(world.locationToScoreCap)
 
     location = world.get_location(f"Heist {world.options.run_length.value} Completed")
     locationRule = HasAllCounts({"Time Bonus": world.itemsForGoal,
@@ -159,7 +158,15 @@ def create_score_locations(world: CrimDawnWorld) -> None:
 
     world.set_rule(location, locationRule)
 
-    victory = items.CrimDawnItem("Victory", ItemClassification.progression, None, world.player)
-    location.place_locked_item(victory)
+    if world.options.goal == "classic":
+        victory = items.CrimDawnItem("Victory", ItemClassification.progression, None, world.player)
+        location.place_locked_item(victory)
 
-    world.set_completion_rule(Has("Victory"))
+        world.set_completion_rule(Has("Victory"))
+
+    elif world.options.goal == "millennial_dream":
+        safehouse = world.get_region(f"Safe House Tier {world.options.run_length.value}")
+        location = safehouse.get_locations()[0]
+        rule = CanReachLocation(location.name)
+
+        world.set_completion_rule(rule)
