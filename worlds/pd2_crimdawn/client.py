@@ -320,10 +320,12 @@ class CrimDawnContext(CommonContext):
         self.itemDict = items.itemDict
 
         print()
+
+        self.runLength = args['slot_data']['run_length']
         self.scoreCaps = args['slot_data']["score_caps"]
 
         self.scribble.writeVariable("timer_strength", args['slot_data']['progression_pacing'])
-        self.scribble.writeVariable("run_length", args['slot_data']['run_length'])
+        self.scribble.writeVariable("run_length", self.runLength)
         self.scribble.writeVariable("max_diff", args['slot_data']['final_difficulty'])
         self.scribble.writeVariable("score_cap", self.scoreCaps[self.timeBonusReceived])
         self.scribble.writeVariable("max_diff_items", args['slot_data']['diff_scale_count'])
@@ -335,6 +337,7 @@ class CrimDawnContext(CommonContext):
 
         keys = list(self.safehouseIdToName)
         self.safehouseRooms = []
+
         for i in range(1, self.runLength + 1):
             for j in range(23):
                 self.safehouseRooms.append(LOCATION_NAME_TO_ID[f"{self.safehouseIdToName[keys[j]].name} (Tier {i})"])
