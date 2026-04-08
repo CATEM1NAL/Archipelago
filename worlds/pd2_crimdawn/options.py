@@ -5,7 +5,12 @@ from Options import Choice, PerGameCommonOptions, Range, Toggle, OptionGroup, De
 
 class Goal(Choice):
     """
-    Goal variants
+    Goals:
+
+    CLASSIC: The normal, intended victory condition of finishing the 4th or 6th heist in a row
+
+    Millenial Dream: Finish building and decorating your very own (safe)house, because I'm sure you can't afford
+    a real one you peasant.
     """
     display_name = "Goal"
 
