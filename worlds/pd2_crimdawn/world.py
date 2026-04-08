@@ -72,6 +72,5 @@ class CrimDawnWorld(World):
         args["seed_name"] = f"cd_{self.multiworld.seed_name}"
         args["score_caps"] = self.locationToScoreCap
         args["diff_scale_count"] = self.botCount + 42
-        args["player_name"] = self.player_name
 
         return args
