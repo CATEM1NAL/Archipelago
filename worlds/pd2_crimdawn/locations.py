@@ -77,22 +77,25 @@ def createSafeHouseLocations(world: CrimDawnWorld) -> None:
     # Safehouse checks
     safeHouseTiers = world.runLength
     if safeHouseTiers == 0:
-        safeHouseTiers = 6
+        if world.goal == "Pointless Day":
+            safeHouseTiers = 2
+        else:
+            safeHouseTiers = 6
 
     for i in range(1, safeHouseTiers + 1):
         currentTier = Region(f"Safe House Tier {i}", world.player, world.multiworld)
         world.multiworld.regions.append(currentTier)
 
-        safehouseAccess = Has("Coins", math.ceil(11.5 * i)) | (Has("Coins", math.ceil(11.5 * (i-1) + 1)) & Has("Glitch Logic"))
-
+        #safehouseAccess = Has("Coins", math.ceil(11.5 * i)) | (Has("Coins", math.ceil(11.5 * (i-1) + 1)) & Has("Glitch Logic"))
+        safehouseAccess = Has("Coins", math.ceil(23/3 * i)) | (Has("Coins", math.ceil(23/3 * (i - 1) + 1)) & Has("Glitch Logic"))
         """
         if hasattr(world.multiworld, "generation_is_fake"):
             safehouseAccess = Has("Coins", math.ceil(11.5 * (i-1) + 1))
         else:
             safehouseAccess = Has("Coins", math.ceil(11.5 * i))
         """
-        if i == 1:
-            safehouseAccess = safehouseAccess & CanReachLocation(f"{triangle(12)} Points")
+        #if i == 1:
+        #    safehouseAccess = safehouseAccess & CanReachLocation(f"{triangle(12)} Points")
         if world.runLength > 0:
             world.create_entrance(world.get_region(f"Heist {i}"), currentTier, safehouseAccess, f"{23 * i} Coins")
         else:
@@ -107,10 +110,10 @@ def createSafeHouseLocations(world: CrimDawnWorld) -> None:
             safehouse.locations.append(location)
             forbid_item(location, "Coins", world.player)
 
-    if world.goal == "Millennial_Dream":
+    if world.goal == "Moving Day":
         safehouse = world.get_region(f"Safe House Tier {safeHouseTiers}")
         location = safehouse.get_locations()[0]
-        rule = CanReachLocation(location.name)
+        rule = CanReachLocation(location.name) #& CanReachLocation(f"{triangle(world.scoreChecks)} Points")
 
         world.set_completion_rule(rule)
 
@@ -120,7 +123,7 @@ def createScoreLocations(world: CrimDawnWorld) -> None:
 
     requiredTimeBonuses = {}
 
-    for i in range(1, world.options.score_checks+1):
+    for i in range(1, world.scoreChecks + 1):
         locName = f"{triangle(i)} Points"
         locId = world.location_name_to_id[locName]
 
@@ -128,25 +131,23 @@ def createScoreLocations(world: CrimDawnWorld) -> None:
         world.multiworld.regions.append(region)
 
         location = CrimDawnLocation(world.player, locName, locId, region)
-        #if i > 1:
-        #    world.set_rule(location, CanReachLocation(f"{triangle(i-1)} Points"))
         region.locations.append(location)
 
-        bots = (i // (world.options.score_checks // world.botCount))
-        #print((i / (world.options.score_checks / world.botCount)) - 1)
+        bots = (i // (world.scoreChecks // world.botCount))
+        #print((i / (world.scoreChecks / world.botCount)) - 1)
 
         if i == 1:
             firstHeist.connect(region, "1 point")
 
         else:
-            #if i < 4 * (world.options.score_checks / max(world.itemsForGoal - 1, 1)):
-            if i < world.options.score_checks:
-                timeBonuses = round(i / (world.options.score_checks / max(world.itemsForGoal - 1, 1)))
+            #if i < 4 * (world.scoreChecks / max(world.itemsForGoal - 1, 1)):
+            if i < world.scoreChecks:
+                timeBonuses = round(i / (world.scoreChecks / max(world.itemsForGoal - 1, 1)))
 
-            #elif 4 * (world.options.score_checks / max(world.itemsForGoal - 1, 1)) <= i < world.options.score_checks:
-            #    timeBonuses =  round(i / (world.options.score_checks / max(world.itemsForGoal - 1, 1)))
+            #elif 4 * (world.scoreChecks / max(world.itemsForGoal - 1, 1)) <= i < world.scoreChecks:
+            #    timeBonuses =  round(i / (world.scoreChecks / max(world.itemsForGoal - 1, 1)))
 
-            elif i == world.options.score_checks:
+            elif i == world.scoreChecks:
                 timeBonuses = round(world.itemsForGoal)
                 if world.options.infinite_time:
                     location.place_locked_item(world.create_item("Time Bonus"))
@@ -158,11 +159,11 @@ def createScoreLocations(world: CrimDawnWorld) -> None:
 
             #locationRule = HasAllCounts({"Time Bonus": timeBonuses,
             #                             "Extra Bot": bots,
-            #                             "Perma-Perk": (i * 7) // world.options.score_checks,
-            #                             "Perma-Skill": (i * 7) // world.options.score_checks})
+            #                             "Perma-Perk": (i * 7) // world.scoreChecks,
+            #                             "Perma-Skill": (i * 7) // world.scoreChecks})
             locationRule = (HasAllCounts({"Time Bonus": timeBonuses,
                                          "Extra Bot": bots}) &
-                            HasGroup("Perma-Upgrades", (i * 14) // world.options.score_checks))
+                            HasGroup("Perma-Upgrades", (i * 14) // world.scoreChecks))
             locationRule = locationRule | (Has("Time Bonus", timeBonuses) & Has("Glitch Logic"))
             print(f"{locName}: {locationRule}")
 
@@ -180,7 +181,7 @@ def createScoreLocations(world: CrimDawnWorld) -> None:
             world.locationToScoreCap.append(prevScore)
             required += 1
         prevScore = score
-    world.locationToScoreCap.append(triangle(world.options.score_checks))
+    world.locationToScoreCap.append(triangle(world.scoreChecks))
 
     if world.runLength > 0:
         location = world.get_location(f"Heist {world.runLength} Completed")

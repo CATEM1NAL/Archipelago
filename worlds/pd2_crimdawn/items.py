@@ -21,7 +21,7 @@ trapItemDict: dict[int, itemData] = {
 }
 
 usefulItemDict: dict[int, itemData] = {
-    200: itemData(IC.progression_deprioritized_skip_balancing, 69, "Coins"),
+    200: itemData(IC.progression_deprioritized_skip_balancing, 0, "Coins"),
     201: itemData(IC.useful, 2, "OVE9000 Saw"),
     202: itemData(IC.useful, 13, "Skill"),
     203: itemData(IC.useful, 13, "Perk"),
@@ -70,8 +70,13 @@ def update_items(world: CrimDawnWorld) -> None:
     progressionItemDict[3] = itemData(itemDict[3][0], world.botCount, *itemDict[3][2:])
     progressionItemDict[4] = itemData(itemDict[4][0], world.options.saws, *itemDict[4][2:])
 
-    if world.options.game_mode == "short":
-        usefulItemDict[200] = itemData(itemDict[200][0], 46, *itemDict[200][2:])
+    maxCoins = math.ceil(2 * (23/3))
+    if world.runLength > 0:
+        maxCoins = math.ceil(23/3 * world.runLength)
+    elif world.goal == "Moving Day":
+        maxCoins = math.ceil(23/3 * 6)
+
+    usefulItemDict[200] = itemData(itemDict[200][0], maxCoins, *itemDict[200][2:])
 
     optList = [world.options.primary_weapons, #300
                world.options.akimbo, #301

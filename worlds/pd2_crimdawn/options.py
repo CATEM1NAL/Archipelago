@@ -7,14 +7,11 @@ class GamePace(Choice):
     The speed at which the world can be played. Slower speeds are more likely to get stuck.
 
     QUICK: Start with 20 minutes, gain 20 with each time bonus.
-    With 100 score checks and 4 heists this can take around 8 hours to goal.
 
     STANDARD: Start with 10 minutes, gain 10 with each time bonus.
-    With default settings this can take around 12 hours to goal.
 
-    GLACIAL: Start with 10 minutes, gain 5 with each time bonus. Typically leads to more spheres.
-    Increasing the number of score checks to at least 150 is recommended!
-    With 150 score checks and 6 heists this can take around ?? hours to goal.
+    GLACIAL: Start with 10 minutes, gain 5 with each time bonus.
+    Adds 20 score checks, leading to more spheres and taking longer to goal.
     """
 
     display_name = "Progression Pacing"
@@ -35,40 +32,31 @@ class InfiniteTime(DefaultOnToggle):
 
 class GameMode(Choice):
     """
-    How many heists you need to complete in a row to reach your goal.
+    SHORT DAY: 4 heists per run, jumping straight to the bigger ones.
+    100 score checks. Timer caps at 60 minutes. Can take around 8 hours to goal.
 
-    SHORT: 4 heists per run, jumping straight to the bigger ones.
-    Makes spheres larger and decreases how long it takes to goal.
+    LONG DAY: 6 heists per run, with the first two being smaller scale.
+    130 score checks. Timer caps at 90 minutes (100 on Quick). Can take around 12 hours to goal.
 
-    FULL: 6 heists per run, with the first two being smaller scale.
+    POINTLESS DAY: Random heists. Win after maxing out your score.
+    80 score checks. Timer caps at 100 minutes. Can take around ?? hours to goal.
+
+    MOVING DAY: Random heists. Win after fully upgrading the safe house.
+    130 score checks. Timer caps at 100 minutes. Can take around ?? hours to goal.
     """
 
-    display_name = "Run Length"
+    display_name = "Game Mode"
 
-    option_short = 1
-    option_full = 2
-    option_score = 3
-    option_millennial_dream = 4
+    option_short_day = 1
+    option_long_day = 2
+    option_pointless_day = 3
+    option_moving_day = 4
 
-    default = option_full
-
-class ScoreLocations(Range):
-    """
-    How many checks are locked behind score requirements.
-    This scales heavily, so be careful about how you set this!
-    (5050 points for 100 checks, 7260 points for 120 checks,
-    11325 points for 150 checks, 80200 points for 400 checks)
-    """
-
-    display_name = "Score Checks"
-
-    range_start = 100
-    range_end = 400
-    default = 120
+    default = option_short_day
 
 class BotCount(Toggle):
     """
-    Whether BigLobby is installed. Recommended to increase score checks by about 20.
+    Whether BigLobby is installed. Adds 20 extra score checks when enabled.
     Enabling this increases the number of extra bots from 3 to a number between 7 and 21,
     however the game may become less stable:
     https://modworkshop.net/mod/21582
@@ -191,7 +179,6 @@ class CrimDawnOptions(PerGameCommonOptions):
     progression_pacing: GamePace
     game_mode: GameMode
     infinite_time: InfiniteTime
-    score_checks: ScoreLocations
     final_difficulty: MaxDiff
     death_link: DeathLink
     saws: AdditionalSaw
