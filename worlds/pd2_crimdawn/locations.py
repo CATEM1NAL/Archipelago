@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 def triangle(n: int) -> int:
     return n * (n + 1) // 2
 
-maxScoreLocations = (400) + 1
+maxScoreLocations = (175) + 1
 LOCATION_NAME_TO_ID = { f"{triangle(i)} Points" : i for i in range(1, maxScoreLocations) }
 
 safehouseRooms = ["Scarface's Room", "Dallas' Office", "Hoxton's Files", "Clover's Surveillance Center",
