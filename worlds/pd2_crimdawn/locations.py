@@ -1,5 +1,5 @@
 from __future__ import annotations
-from rule_builder.rules import Has, HasAllCounts, CanReachLocation
+from rule_builder.rules import Has, HasGroup, HasAllCounts, CanReachLocation
 from worlds.generic.Rules import forbid_item
 
 from typing import TYPE_CHECKING
@@ -141,12 +141,15 @@ def create_score_locations(world: CrimDawnWorld) -> None:
 
             requiredTimeBonuses.update({triangle(i): timeBonuses})
 
-            locationRule = HasAllCounts({"Time Bonus": timeBonuses,
-                                         "Extra Bot": bots,
-                                         "Perma-Perk": i // (world.options.score_checks // 7),
-                                         "Perma-Skill": i // (world.options.score_checks // 7)})
+            #locationRule = HasAllCounts({"Time Bonus": timeBonuses,
+            #                             "Extra Bot": bots,
+            #                             "Perma-Perk": (i * 7) // world.options.score_checks,
+            #                             "Perma-Skill": (i * 7) // world.options.score_checks})
+            locationRule = (HasAllCounts({"Time Bonus": timeBonuses,
+                                         "Extra Bot": bots}) &
+                            HasGroup("Perma-Upgrades", (i * 14) // world.options.score_checks))
             locationRule = locationRule | (Has("Time Bonus", timeBonuses) & Has("Glitch Logic"))
-            print(f"{locName}: {locationRule}")
+            #print(f"{locName}: {locationRule}")
 
             world.set_rule(location, locationRule)
 

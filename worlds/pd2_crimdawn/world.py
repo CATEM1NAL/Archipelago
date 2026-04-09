@@ -41,6 +41,10 @@ class CrimDawnWorld(World):
     glitches_item_name: str = "Glitch Logic"
 
     def generate_early(self) -> None:
+        self.item_name_groups.update({"Perma-Upgrades": set()})
+        self.item_name_groups["Perma-Upgrades"].add("Perma-Perk")
+        self.item_name_groups["Perma-Upgrades"].add("Perma-Skill")
+
         self.itemsForGoal = round((self.options.run_length.value * 15) / self.options.progression_pacing.value - 1)
 
         if self.options.biglobby == 0:
