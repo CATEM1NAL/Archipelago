@@ -1,6 +1,7 @@
 from collections.abc import Mapping
 from typing import Any, ClassVar
 import settings, logging
+from BaseClasses import ItemClassification as IC
 
 from worlds.AutoWorld import World, WebWorld
 
@@ -37,6 +38,7 @@ class CrimDawnWorld(World):
     logger = logging.getLogger("Criminal Dawn")
 
     origin_region_name = "Crime.net"
+    glitches_item_name: str = "Glitch Logic"
 
     def generate_early(self) -> None:
         self.itemsForGoal = round((self.options.run_length.value * 15) / self.options.progression_pacing.value - 1)
@@ -55,8 +57,11 @@ class CrimDawnWorld(World):
         items.create_all_items(self)
 
     def create_item(self, name: str) -> items.CrimDawnItem:
+        if name == "Glitch Logic":
+            return items.CrimDawnItem("Glitch Logic", IC.progression, None, self.player)
+
         itemId: int = items.ITEM_NAME_TO_ID[name]
-        return items.CrimDawnItem(name, items.itemDict[itemId].classification, itemId, player=self.player)
+        return items.CrimDawnItem(name, items.itemDict[itemId].classification, itemId, self.player)
 
     def get_filler_item_name(self) -> str:
         return items.get_random_filler_item_name(self)

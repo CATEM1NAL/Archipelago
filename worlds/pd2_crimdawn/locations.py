@@ -3,7 +3,7 @@ from rule_builder.rules import Has, HasAllCounts, CanReachLocation
 from worlds.generic.Rules import forbid_item
 
 from typing import TYPE_CHECKING
-from BaseClasses import ItemClassification, Location, Region, LocationProgressType
+from BaseClasses import ItemClassification as IC, Location, Region, LocationProgressType
 from . import items
 import math
 
@@ -58,7 +58,12 @@ def create_and_connect_regions(world: CrimDawnWorld) -> None:
         else: #Create Entrance connecting the heist region to the previous heist region
             #itemsForConnection = math.floor(world.itemsForGoal / world.options.run_length.value * i)
             itemsForConnection = math.ceil(((i * 15) / world.options.progression_pacing) - 1)
-            world.create_entrance(world.get_region(f"Heist {i - 1}"), heistRegion, Has("Time Bonus", itemsForConnection), f"Heist {i} Requirements")
+            entranceRule = Has("Time Bonus", itemsForConnection)
+
+            itemsForGlitchLogic = math.ceil(((i * 10) / world.options.progression_pacing) - 1)
+            entranceRule = entranceRule | (Has("Time Bonus", itemsForGlitchLogic) & Has("Glitch Logic"))
+
+            world.create_entrance(world.get_region(f"Heist {i - 1}"), heistRegion, entranceRule, f"Heist {i} Requirements")
 
         print(f"Heist {i}: {itemsForConnection} time bonuses ({world.options.progression_pacing.value * (itemsForConnection + 1)} minutes)")
 
@@ -68,7 +73,14 @@ def create_safe_house(world: CrimDawnWorld) -> None:
         currentTier = Region(f"Safe House Tier {i}", world.player, world.multiworld)
         world.multiworld.regions.append(currentTier)
 
-        safehouseAccess = Has("Coins", math.ceil(11.5 * i))
+        safehouseAccess = Has("Coins", math.ceil(11.5 * i)) | (Has("Coins", math.ceil(11.5 * (i-1) + 1)) & Has("Glitch Logic"))
+
+        """
+        if hasattr(world.multiworld, "generation_is_fake"):
+            safehouseAccess = Has("Coins", math.ceil(11.5 * (i-1) + 1))
+        else:
+            safehouseAccess = Has("Coins", math.ceil(11.5 * i))
+        """
         #if i == 1:
         #    safehouseAccess = safehouseAccess & CanReachLocation(f"{triangle(12)} Points")
 
@@ -92,6 +104,7 @@ def create_score_locations(world: CrimDawnWorld) -> None:
     firstHeist = world.get_region("Crime.net")
 
     requiredTimeBonuses = {}
+
     for i in range(1, world.options.score_checks+1):
         locName = f"{triangle(i)} Points"
         locId = world.location_name_to_id[locName]
@@ -132,7 +145,8 @@ def create_score_locations(world: CrimDawnWorld) -> None:
                                          "Extra Bot": bots,
                                          "Perma-Perk": i // (world.options.score_checks // 7),
                                          "Perma-Skill": i // (world.options.score_checks // 7)})
-            #print(f"{locName}: {locationRule}")
+            locationRule = locationRule | (Has("Time Bonus", timeBonuses) & Has("Glitch Logic"))
+            print(f"{locName}: {locationRule}")
 
             world.set_rule(location, locationRule)
 
@@ -159,7 +173,7 @@ def create_score_locations(world: CrimDawnWorld) -> None:
     world.set_rule(location, locationRule)
 
     if world.options.goal == "classic":
-        victory = items.CrimDawnItem("Victory", ItemClassification.progression, None, world.player)
+        victory = items.CrimDawnItem("Victory", IC.progression, None, world.player)
         location.place_locked_item(victory)
 
         world.set_completion_rule(Has("Victory"))
