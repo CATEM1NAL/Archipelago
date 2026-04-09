@@ -88,12 +88,7 @@ def createSafeHouseLocations(world: CrimDawnWorld) -> None:
 
         #safehouseAccess = Has("Coins", math.ceil(11.5 * i)) | (Has("Coins", math.ceil(11.5 * (i-1) + 1)) & Has("Glitch Logic"))
         safehouseAccess = Has("Coins", math.ceil(23/3 * i)) | (Has("Coins", math.ceil(23/3 * (i - 1) + 1)) & Has("Glitch Logic"))
-        """
-        if hasattr(world.multiworld, "generation_is_fake"):
-            safehouseAccess = Has("Coins", math.ceil(11.5 * (i-1) + 1))
-        else:
-            safehouseAccess = Has("Coins", math.ceil(11.5 * i))
-        """
+
         #if i == 1:
         #    safehouseAccess = safehouseAccess & CanReachLocation(f"{triangle(12)} Points")
         if world.runLength > 0:
