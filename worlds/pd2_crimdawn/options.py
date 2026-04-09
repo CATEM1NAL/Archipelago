@@ -33,16 +33,20 @@ class InfiniteTime(DefaultOnToggle):
 class GameMode(Choice):
     """
     SHORT DAY: 4 heists per run, jumping straight to the bigger ones.
-    100 score checks. Timer caps at 60 minutes. Can take around 8 hours to goal.
+    100 score checks, 4 safe house tiers. Timer caps at 60 minutes.
+    Can take around 8 hours to goal.
 
     LONG DAY: 6 heists per run, with the first two being smaller scale.
-    130 score checks. Timer caps at 90 minutes (100 on Quick). Can take around 12 hours to goal.
+    130 score checks, 6 safe house tiers. Timer caps at 90 minutes (100 on quick).
+    Can take around 12 hours to goal.
 
     POINTLESS DAY: Random heists. Win after maxing out your score.
-    80 score checks. Timer caps at 100 minutes. Can take around ?? hours to goal.
+    80 score checks, 2 safe house tiers. Timer caps at 100 minutes.
+    Can take around ?? hours to goal.
 
     MOVING DAY: Random heists. Win after fully upgrading the safe house.
-    130 score checks. Timer caps at 100 minutes. Can take around ?? hours to goal.
+    130 score checks, 6 safe house tiers. Timer caps at 100 minutes.
+    Can take around ?? hours to goal.
     """
 
     display_name = "Game Mode"
