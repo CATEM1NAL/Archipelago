@@ -40,17 +40,28 @@ class CrimDawnWorld(World):
     origin_region_name = "Crime.net"
     glitches_item_name: str = "Glitch Logic"
 
+    ut_can_gen_without_yaml = True
+
     def generate_early(self) -> None:
         self.item_name_groups.update({"Perma-Upgrades": set()})
         self.item_name_groups["Perma-Upgrades"].add("Perma-Perk")
         self.item_name_groups["Perma-Upgrades"].add("Perma-Skill")
 
-        self.itemsForGoal = round((self.options.run_length.value * 15) / self.options.progression_pacing.value - 1)
+        if hasattr(self.multiworld, "re_gen_passthrough"):
+            if self.game in self.multiworld.re_gen_passthrough:
+                slot_data: dict[str, Any] = self.multiworld.re_gen_passthrough[self.game]
+                self.options.progression_pacing.value = slot_data["progression_pacing"]
+                self.options.run_length.value = slot_data["run_length"]
+                self.options.score_checks.value = slot_data["score_checks"]
+                self.botCount = slot_data["diff_scale_count"] - 42
 
-        if self.options.biglobby == 0:
-            self.botCount = 3
-        else:
-            self.botCount = self.random.randint(7,21)
+        self.itemsForGoal = round((self.options.run_length * 15) / self.options.progression_pacing - 1)
+
+        if not hasattr(self.multiworld, "re_gen_passthrough"):
+            if self.options.biglobby == 0:
+                self.botCount = 3
+            else:
+                self.botCount = self.random.randint(7,21)
 
     def create_regions(self) -> None:
         locations.create_and_connect_regions(self)
@@ -74,6 +85,7 @@ class CrimDawnWorld(World):
         args = self.options.as_dict(
             "progression_pacing",
             "run_length",
+            "score_checks",
             "final_difficulty",
             "death_link",
             "goal"

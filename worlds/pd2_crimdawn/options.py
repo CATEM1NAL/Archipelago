@@ -5,18 +5,16 @@ from Options import Choice, PerGameCommonOptions, Range, Toggle, OptionGroup, De
 
 class Goal(Choice):
     """
-    Goals:
+    CLASSIC: The normal, intended victory condition of finishing the 4th or 6th heist in a row.
 
-    CLASSIC: The normal, intended victory condition of finishing the 4th or 6th heist in a row
-
-    Millenial Dream: Finish building and decorating your very own (safe)house, because I'm sure you can't afford
-    a real one you peasant.
+    MILLENNIAL DREAM: Finish building and decorating your very own (safe)house. This mode
     """
     display_name = "Goal"
 
     option_classic = 1
     option_millennial_dream = 2
 
+    default = option_classic
 
 class GamePace(Choice):
     """
