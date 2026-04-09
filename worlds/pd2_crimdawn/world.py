@@ -43,29 +43,42 @@ class CrimDawnWorld(World):
     ut_can_gen_without_yaml = True
 
     def generate_early(self) -> None:
-        self.item_name_groups.update({"Perma-Upgrades": set()})
-        self.item_name_groups["Perma-Upgrades"].add("Perma-Perk")
-        self.item_name_groups["Perma-Upgrades"].add("Perma-Skill")
-
-        if hasattr(self.multiworld, "re_gen_passthrough"):
-            if self.game in self.multiworld.re_gen_passthrough:
-                slot_data: dict[str, Any] = self.multiworld.re_gen_passthrough[self.game]
-                self.options.progression_pacing.value = slot_data["progression_pacing"]
-                self.options.run_length.value = slot_data["run_length"]
-                self.options.score_checks.value = slot_data["score_checks"]
-                self.botCount = slot_data["diff_scale_count"] - 42
-
-        self.itemsForGoal = round((self.options.run_length * 15) / self.options.progression_pacing - 1)
-
         if not hasattr(self.multiworld, "re_gen_passthrough"):
+            self.yaml_overrides()
+            gameModeToRunLength = {"Short": 4, "Full": 6, "Score": 0, "Texas Heat": 4, "Millennial Dream": 0}
+            self.goal = self.options.game_mode.get_option_name(self.options.game_mode.value)
+            print(self.options.game_mode.value)
+            print(self.goal)
+            self.runLength = gameModeToRunLength[self.goal]
+
             if self.options.biglobby == 0:
                 self.botCount = 3
             else:
                 self.botCount = self.random.randint(7,21)
 
+        elif self.game in self.multiworld.re_gen_passthrough:
+            slot_data: dict[str, Any] = self.multiworld.re_gen_passthrough[self.game]
+            self.options.progression_pacing.value = slot_data["progression_pacing"]
+            self.runLength = slot_data["run_length"]
+            self.options.score_checks.value = slot_data["score_checks"]
+            self.botCount = slot_data["diff_scale_count"] - 42
+
+        self.item_name_groups.update({"Perma-Upgrades": set()})
+        self.item_name_groups["Perma-Upgrades"].add("Perma-Perk")
+        self.item_name_groups["Perma-Upgrades"].add("Perma-Skill")
+
+        if self.runLength > 0:
+            self.itemsForGoal = round((self.runLength * 15) / self.options.progression_pacing.value - 1)
+        else:
+            self.itemsForGoal = round(100 / self.options.progression_pacing.value - 1)
+
+
+    def yaml_overrides(self):
+        if self.options.progression_pacing.value == "glacial" and self.options.score_checks.value < 150:
+            self.options.score_checks.value = 150
+
     def create_regions(self) -> None:
-        locations.create_and_connect_regions(self)
-        locations.create_all_locations(self)
+        locations.createAllLocations(self)
 
     def create_items(self) -> None:
         items.update_items(self)
@@ -84,15 +97,15 @@ class CrimDawnWorld(World):
     def fill_slot_data(self) -> Mapping[str, Any]:
         args = self.options.as_dict(
             "progression_pacing",
-            "run_length",
             "score_checks",
             "final_difficulty",
-            "death_link",
-            "goal"
+            "death_link"
         )
         args["server_version"] = self.world_version.as_simple_string()
         args["seed_name"] = f"cd_{self.multiworld.seed_name}"
         args["score_caps"] = self.locationToScoreCap
         args["diff_scale_count"] = self.botCount + 42
+        args["run_length"] = self.runLength
+        args["goal"] = self.goal
 
         return args

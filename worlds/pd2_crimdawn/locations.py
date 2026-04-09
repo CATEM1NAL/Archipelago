@@ -33,23 +33,29 @@ LOCATION_NAME_TO_ID.update({f"Heist {i} Completed": i + maxScoreLocations + (len
 class CrimDawnLocation(Location):
     game = "PAYDAY 2: Criminal Dawn"
 
-def create_and_connect_regions(world: CrimDawnWorld) -> None:
+def createAllLocations(world: CrimDawnWorld) -> None:
     world.multiworld.regions.append(Region("Crime.net", world.player, world.multiworld))
+    if world.runLength > 0:
+        createHeistCompletionLocations(world)
+    createScoreLocations(world)
+    createSafeHouseLocations(world)
+
+def createHeistCompletionLocations(world: CrimDawnWorld) -> None:
     crimenet = world.get_region("Crime.net")
 
     # Heist completion checks
-    for i in range(1, world.options.run_length.value + 1):
+    for i in range(1, world.runLength + 1):
         world.multiworld.regions.append(Region(f"Heist {i}", world.player, world.multiworld))
         heistRegion = world.get_region(f"Heist {i}")
         locName = f"Heist {i} Completed"
         locId = world.location_name_to_id[locName]
-        if i == world.options.run_length.value: locId = None
+        if i == world.runLength: locId = None
         location = CrimDawnLocation(world.player, locName, locId, heistRegion)
         location.progress_type = LocationProgressType.PRIORITY
         heistRegion.locations.append(location)
 
         if i == 1:
-            if world.options.run_length < 6:
+            if world.runLength < 6:
                 itemsForConnection = math.floor(15 / world.options.progression_pacing.value - 0.5)
             else:
                 itemsForConnection = math.floor(10 / world.options.progression_pacing.value - 0.5)
@@ -65,11 +71,15 @@ def create_and_connect_regions(world: CrimDawnWorld) -> None:
 
             world.create_entrance(world.get_region(f"Heist {i - 1}"), heistRegion, entranceRule, f"Heist {i} Requirements")
 
-        print(f"Heist {i}: {itemsForConnection} time bonuses ({world.options.progression_pacing.value * (itemsForConnection + 1)} minutes)")
+        #print(f"Heist {i}: {itemsForConnection} time bonuses ({world.options.progression_pacing.value * (itemsForConnection + 1)} minutes)")
 
-def create_safe_house(world: CrimDawnWorld) -> None:
+def createSafeHouseLocations(world: CrimDawnWorld) -> None:
     # Safehouse checks
-    for i in range(1, world.options.run_length.value + 1):
+    safeHouseTiers = world.runLength
+    if safeHouseTiers == 0:
+        safeHouseTiers = 6
+
+    for i in range(1, safeHouseTiers + 1):
         currentTier = Region(f"Safe House Tier {i}", world.player, world.multiworld)
         world.multiworld.regions.append(currentTier)
 
@@ -81,12 +91,14 @@ def create_safe_house(world: CrimDawnWorld) -> None:
         else:
             safehouseAccess = Has("Coins", math.ceil(11.5 * i))
         """
-        #if i == 1:
-        #    safehouseAccess = safehouseAccess & CanReachLocation(f"{triangle(12)} Points")
+        if i == 1:
+            safehouseAccess = safehouseAccess & CanReachLocation(f"{triangle(12)} Points")
+        if world.runLength > 0:
+            world.create_entrance(world.get_region(f"Heist {i}"), currentTier, safehouseAccess, f"{23 * i} Coins")
+        else:
+            world.create_entrance(world.get_region(f"Crime.net"), currentTier, safehouseAccess, f"{23 * i} Coins")
 
-        world.create_entrance(world.get_region(f"Heist {i}"), currentTier, safehouseAccess, f"{23 * i} Coins")
-
-    for i in range(1, world.options.run_length.value + 1):
+    for i in range(1, safeHouseTiers + 1):
         safehouse = world.get_region(f"Safe House Tier {i}")
         for room in safehouseRooms:
             locName = f"{room} (Tier {i})"
@@ -95,11 +107,14 @@ def create_safe_house(world: CrimDawnWorld) -> None:
             safehouse.locations.append(location)
             forbid_item(location, "Coins", world.player)
 
-def create_all_locations(world: CrimDawnWorld) -> None:
-    create_safe_house(world)
-    create_score_locations(world)
+    if world.goal == "Millennial_Dream":
+        safehouse = world.get_region(f"Safe House Tier {safeHouseTiers}")
+        location = safehouse.get_locations()[0]
+        rule = CanReachLocation(location.name)
 
-def create_score_locations(world: CrimDawnWorld) -> None:
+        world.set_completion_rule(rule)
+
+def createScoreLocations(world: CrimDawnWorld) -> None:
     # Create regions, assign a location to each region, chain entrances together
     firstHeist = world.get_region("Crime.net")
 
@@ -149,7 +164,6 @@ def create_score_locations(world: CrimDawnWorld) -> None:
                                          "Extra Bot": bots}) &
                             HasGroup("Perma-Upgrades", (i * 14) // world.options.score_checks))
             locationRule = locationRule | (Has("Time Bonus", timeBonuses) & Has("Glitch Logic"))
-            print((i * 14) // world.options.score_checks)
             print(f"{locName}: {locationRule}")
 
             world.set_rule(location, locationRule)
@@ -168,23 +182,16 @@ def create_score_locations(world: CrimDawnWorld) -> None:
         prevScore = score
     world.locationToScoreCap.append(triangle(world.options.score_checks))
 
-    location = world.get_location(f"Heist {world.options.run_length.value} Completed")
-    locationRule = HasAllCounts({"Time Bonus": world.itemsForGoal,
-                                 "Extra Bot": world.botCount,
-                                 "Perma-Perk": 7,
-                                 "Perma-Skill": 7})
+    if world.runLength > 0:
+        location = world.get_location(f"Heist {world.runLength} Completed")
+        locationRule = HasAllCounts({"Time Bonus": world.itemsForGoal,
+                                     "Extra Bot": world.botCount,
+                                     "Perma-Perk": 7,
+                                     "Perma-Skill": 7})
 
-    world.set_rule(location, locationRule)
+        world.set_rule(location, locationRule)
 
-    if world.options.goal == "classic":
         victory = items.CrimDawnItem("Victory", IC.progression, None, world.player)
         location.place_locked_item(victory)
 
         world.set_completion_rule(Has("Victory"))
-
-    elif world.options.goal == "millennial_dream":
-        safehouse = world.get_region(f"Safe House Tier {world.options.run_length.value}")
-        location = safehouse.get_locations()[0]
-        rule = CanReachLocation(location.name)
-
-        world.set_completion_rule(rule)

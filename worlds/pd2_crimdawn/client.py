@@ -100,14 +100,16 @@ class scrungle:
                                 await self.context.score_check(score)
                                 prevScore = score
 
-                            if prevHeistsWon < heistsWon <= self.context.runLength:
+                            if prevHeistsWon < heistsWon:
+                                prevHeistsWon = heistsWon
+                                if heistsWon > self.context.runLength:
+                                    heistsWon = self.context.runLength
                                 for i in range (1, heistsWon + 1):
                                     print(f"Heist {i} Completed")
                                     heist = LOCATION_NAME_TO_ID[f"Heist {i} Completed"]
                                     await self.context.check_locations([heist])
-                                if heistsWon >= self.context.runLength and self.context.goal == "classic":
+                                if 0 < self.context.runLength == heistsWon:
                                     await self.context.send_msgs([{"cmd": "StatusUpdate", "status": ClientStatus.CLIENT_GOAL}])
-                                prevHeistsWon = heistsWon
 
                             if prevRun == -1: prevRun = run
 
@@ -286,9 +288,6 @@ class CrimDawnContext(CommonContext):
         except (FileNotFoundError, json.decoder.JSONDecodeError) as e:
             print(f"Couldn't load crimdawn_save.txt: {e}")
 
-        self.goal = args['slot_data']['goal']
-        self.runLength = args['slot_data']['run_length']
-
         # Switch saves automatically if the seed/slot names don't match
         if (modSeed and modSeed != args['slot_data']['seed_name']) or (modSlot and modSlot != self.player_names[self.slot]):
             try:
@@ -332,11 +331,11 @@ class CrimDawnContext(CommonContext):
 
         self.itemDict = items.itemDict
 
-        print()
-
+        self.goal = args['slot_data']['goal']
         self.runLength = args['slot_data']['run_length']
         self.scoreCaps = args['slot_data']["score_caps"]
 
+        self.scribble.writeVariable("goal", self.goal)
         self.scribble.writeVariable("timer_strength", args['slot_data']['progression_pacing'])
         self.scribble.writeVariable("run_length", self.runLength)
         self.scribble.writeVariable("max_diff", args['slot_data']['final_difficulty'])
@@ -413,7 +412,7 @@ class CrimDawnContext(CommonContext):
                     if id in self.missing_locations:
                         await self.check_locations([id])
 
-            if self.goal == "millennial_dream":
+            if self.goal == "Millennial Dream":
                 flag = True
                 for location in self.safehouseLocations:
                     id = LOCATION_NAME_TO_ID[location]

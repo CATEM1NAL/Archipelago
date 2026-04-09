@@ -70,7 +70,7 @@ def update_items(world: CrimDawnWorld) -> None:
     progressionItemDict[3] = itemData(itemDict[3][0], world.botCount, *itemDict[3][2:])
     progressionItemDict[4] = itemData(itemDict[4][0], world.options.saws, *itemDict[4][2:])
 
-    if world.options.run_length == "short":
+    if world.options.game_mode == "short":
         usefulItemDict[200] = itemData(itemDict[200][0], 46, *itemDict[200][2:])
 
     optList = [world.options.primary_weapons, #300
@@ -135,6 +135,7 @@ def create_all_items(world: CrimDawnWorld) -> None:
             else:
                 breakCounter += 1
         if breakCounter == 8:
+            print(world.multiworld.get_unfilled_locations(world.player))
             world.logger.warning(f"WARNING: {world.player_name} attempted generation of too many items!")
             break
 

@@ -1,20 +1,6 @@
 from dataclasses import dataclass
 
-from Options import Choice, PerGameCommonOptions, Range, Toggle, OptionGroup, DefaultOnToggle
-
-
-class Goal(Choice):
-    """
-    CLASSIC: The normal, intended victory condition of finishing the 4th or 6th heist in a row.
-
-    MILLENNIAL DREAM: Finish building and decorating your very own (safe)house. This mode
-    """
-    display_name = "Goal"
-
-    option_classic = 1
-    option_millennial_dream = 2
-
-    default = option_classic
+from Options import Choice, TextChoice, PerGameCommonOptions, Range, Toggle, OptionGroup, DefaultOnToggle
 
 class GamePace(Choice):
     """
@@ -47,7 +33,7 @@ class InfiniteTime(DefaultOnToggle):
 
     display_name = "Infinite Time"
 
-class RunLength(Choice):
+class GameMode(Choice):
     """
     How many heists you need to complete in a row to reach your goal.
 
@@ -59,8 +45,10 @@ class RunLength(Choice):
 
     display_name = "Run Length"
 
-    option_short = 4
-    option_full = 6
+    option_short = 1
+    option_full = 2
+    option_score = 3
+    option_millennial_dream = 4
 
     default = option_full
 
@@ -200,9 +188,8 @@ class DeathLink(Toggle):
 
 @dataclass
 class CrimDawnOptions(PerGameCommonOptions):
-    goal: Goal
     progression_pacing: GamePace
-    run_length: RunLength
+    game_mode: GameMode
     infinite_time: InfiniteTime
     score_checks: ScoreLocations
     final_difficulty: MaxDiff
