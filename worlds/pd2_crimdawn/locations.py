@@ -149,7 +149,8 @@ def create_score_locations(world: CrimDawnWorld) -> None:
                                          "Extra Bot": bots}) &
                             HasGroup("Perma-Upgrades", (i * 14) // world.options.score_checks))
             locationRule = locationRule | (Has("Time Bonus", timeBonuses) & Has("Glitch Logic"))
-            #print(f"{locName}: {locationRule}")
+            print((i * 14) // world.options.score_checks)
+            print(f"{locName}: {locationRule}")
 
             world.set_rule(location, locationRule)
 
