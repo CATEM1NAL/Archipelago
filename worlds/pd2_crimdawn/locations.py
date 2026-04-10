@@ -29,6 +29,7 @@ LOCATION_NAME_TO_ID.update({f"{room} (Tier 4)": key + maxScoreLocations + (len(s
 LOCATION_NAME_TO_ID.update({f"{room} (Tier 5)": key + maxScoreLocations + (len(safehouseRooms) * 4) for key, room in enumerate(safehouseRooms)})
 LOCATION_NAME_TO_ID.update({f"{room} (Tier 6)": key + maxScoreLocations + (len(safehouseRooms) * 5) for key, room in enumerate(safehouseRooms)})
 LOCATION_NAME_TO_ID.update({f"Heist {i} Completed": i + maxScoreLocations + (len(safehouseRooms) * 6) for i in range(1, 7)})
+LOCATION_NAME_TO_ID.update({"Safehouse Completed": maxScoreLocations + (len(safehouseRooms) * 6) + 7})
 
 class CrimDawnLocation(Location):
     game = "PAYDAY 2: Criminal Dawn"
@@ -83,6 +84,8 @@ def createSafeHouseLocations(world: CrimDawnWorld) -> None:
             safeHouseTiers = 2
         else:
             safeHouseTiers = 6
+    elif world.isCampaign:
+        safeHouseTiers = 1
 
     for i in range(1, safeHouseTiers + 1):
         currentTier = Region(f"Safe House Tier {i}", world.player, world.multiworld)
@@ -107,9 +110,13 @@ def createSafeHouseLocations(world: CrimDawnWorld) -> None:
             forbid_item(location, "Coins", world.player)
 
     if world.goal == "Moving Day":
-        safehouse = world.get_region(f"Safe House Tier {safeHouseTiers}")
-        location = safehouse.get_locations()[0]
         rule = CanReachLocation(location.name) #& CanReachLocation(f"{triangle(world.scoreChecks)} Points")
+        location = CrimDawnLocation(world.player, "Safehouse Completed", None, safehouse)#safehouse.get_locations()[0]
+        safehouse.locations.append(location)
+
+        world.set_rule(location, rule)
+        victory = items.CrimDawnItem("Victory", IC.progression, None, world.player)
+        location.place_locked_item(victory)
 
 def createScoreLocations(world: CrimDawnWorld) -> None:
     # Create regions, assign a location to each region, chain entrances together

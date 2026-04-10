@@ -48,12 +48,17 @@ class CrimDawnWorld(World):
                 "Short Day": gameModeData(4, 75, False),
                 "Long Day": gameModeData(6, 120, False),
                 "Pointless Day": gameModeData(0, 85, False),
-                "Moving Day": gameModeData(0, 130, False),
-                "I Need My Payday Too": gameModeData(6, 75, True),
-                "Greatest Heist Of All" : gameModeData(4, 75, True),
-                "Silk Road" : gameModeData(4, 75, True),
-                "City of Gold": gameModeData(4, 75, True),
-                "Texas Heat": gameModeData(4, 75, True),
+                "Moving Day": gameModeData(0, 120, False),
+                "Return Of The Rat": gameModeData(4, 80, True),
+                "Murky Day": gameModeData(4, 80, True),
+                "I Need My Payday Too": gameModeData(5, 80, True),
+                "Greatest Heist Of All": gameModeData(6, 80, True),
+                "Silk Road" : gameModeData(4, 80, True),
+                "City Of Gold": gameModeData(3, 80, True),
+                "Texas Heat": gameModeData(3, 80, True),
+                "Night Of Frights": gameModeData(4, 80, True),
+                "Christmas Special": gameModeData(4, 80, True),
+                "Classics": gameModeData(6, 80, True),
             }
             self.goal = self.options.game_mode.get_option_name(self.options.game_mode.value)
             self.runLength = gameModeDict[self.goal].runLength
@@ -70,6 +75,7 @@ class CrimDawnWorld(World):
             self.scoreChecks = slot_data["score_checks"]
             self.botCount = slot_data["diff_scale_count"] - 42
             self.goal = slot_data["goal"]
+            self.isCampaign = slot_data["campaign"]
 
         self.item_name_groups.update({"Perma-Upgrades": set()})
         self.item_name_groups["Perma-Upgrades"].add("Perma-Perk")

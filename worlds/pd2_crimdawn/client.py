@@ -334,6 +334,8 @@ class CrimDawnContext(CommonContext):
         self.goal = args['slot_data']['goal']
         self.runLength = args['slot_data']['run_length']
         self.scoreCaps = args['slot_data']["score_caps"]
+        self.campaign = args['slot_data']["campaign"]
+
 
         self.scribble.writeVariable("goal", self.goal)
         self.scribble.writeVariable("timer_strength", args['slot_data']['progression_pacing'])
@@ -342,6 +344,7 @@ class CrimDawnContext(CommonContext):
         self.scribble.writeVariable("score_cap", self.scoreCaps[self.timeBonusReceived])
         self.scribble.writeVariable("max_diff_items", args['slot_data']['diff_scale_count'])
         self.scribble.writeVariable("slot", self.player_names[self.slot])
+        self.scribble.writeVariable("campaign", self.campaign)
 
         self.deathLinkEnabled = args['slot_data']["death_link"]
         if self.deathLinkEnabled:
@@ -364,6 +367,7 @@ class CrimDawnContext(CommonContext):
             }]))
 
     def on_received_items(self, args: dict):
+        print("sdhfashf")
         # for entry in self.items_received:
         for entry in args["items"]:
             try:

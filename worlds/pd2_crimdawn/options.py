@@ -46,6 +46,30 @@ class GameMode(Choice):
     MOVING DAY: Random heists. Win after fully upgrading the safe house.
     130 score checks, 6 safe house tiers. Timer caps at 100 minutes.
     Can take around ?? hours to goal (?? hours on Glacial).
+
+    The following modes are campaigns. They have 80 score checks, a single
+    safe house tier, and the heists are fixed. Some of them require DLC to play,
+    so check that you own the required heists before enabling them!
+
+    RETURN OF THE RAT: Watch Dogs, Firestarter, Rats, Hoxton Revenge.
+
+    MURKY DAY: Shadow Raid, Meltdown, Beneath the Mountain (DLC), Henry's Rock.
+
+    I NEED MY PAYDAY TOO: Big Bank (DLC), The Diamond (DLC), Hotline Miami (DLC),
+    Hoxton Breakout, Golden Grin Casino (DLC).
+
+    GREATEST HEIST OF ALL: Reservoir Dogs (licensed), Brooklyn Bank,
+    Shacklethorne Auction, Breakin' Feds, Hell's Island, White House.
+
+    SILK ROAD: Border Crossing (DLC), San Martín Bank (DLC),
+    Breakfast in Tijuana (DLC), Buluc's Mansion (DLC).
+
+    CITY OF GOLD: Dragon Heist (DLC), Black Cat (DLC), Mountain Master (DLC).
+
+    TEXAS HEAT: Midland Ranch (DLC), Hostile Takeover (DLC), Crude Awakening (DLC).
+
+    CLASSICS: First World Bank, Heat Street, Panic Room, Green Bridge,
+    Diamond Heist, Slaughterhouse.
     """
 
     display_name = "Game Mode"
@@ -54,6 +78,14 @@ class GameMode(Choice):
     option_long_day = 2
     option_pointless_day = 3
     option_moving_day = 4
+    option_return_of_the_rat = 100
+    option_murky_day = 101
+    option_i_need_my_payday_too = 102
+    option_greatest_heist_of_all = 103
+    option_silk_road = 104
+    option_city_of_gold = 105
+    option_texas_heat = 106
+    option_classics = 107
 
     default = option_short_day
 
