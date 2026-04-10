@@ -184,13 +184,4 @@ class CrimDawnOptions(PerGameCommonOptions):
     game_mode: GameMode
     final_difficulty: MaxDiff
     death_link: DeathLink
-    saws: AdditionalSaw
     biglobby: BotCount
-
-option_groups = [
-    OptionGroup(
-        "Item Generation",
-        [AdditionalSaw,
-         BotCount],
-    ),
-]

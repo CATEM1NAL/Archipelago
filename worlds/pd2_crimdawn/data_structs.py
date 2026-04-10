@@ -13,3 +13,4 @@ class safeHouseData(NamedTuple):
 class gameModeData(NamedTuple):
     runLength: int
     scoreChecks: int
+    campaign: bool

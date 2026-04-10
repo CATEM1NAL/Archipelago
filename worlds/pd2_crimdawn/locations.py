@@ -88,7 +88,6 @@ def createSafeHouseLocations(world: CrimDawnWorld) -> None:
         currentTier = Region(f"Safe House Tier {i}", world.player, world.multiworld)
         world.multiworld.regions.append(currentTier)
 
-        #safehouseAccess = Has("Coins", math.ceil(11.5 * i)) | (Has("Coins", math.ceil(11.5 * (i-1) + 1)) & Has("Glitch Logic"))
         safehouseAccess = Has("Coins", math.ceil(23/3 * i)) | (Has("Coins", math.ceil(23/3 * (i - 1) + 1)) & Has("Glitch Logic"))
 
         #if i == 1:
@@ -128,7 +127,6 @@ def createScoreLocations(world: CrimDawnWorld) -> None:
         location = CrimDawnLocation(world.player, locName, locId, region)
 
         bots = (i // (world.scoreChecks // world.botCount))
-        #print((i / (world.scoreChecks / world.botCount)) - 1)
 
         if i == 1:
             firstHeist.connect(region, "1 point")
@@ -156,16 +154,11 @@ def createScoreLocations(world: CrimDawnWorld) -> None:
                 timeBonuses = 0
 
             requiredTimeBonuses.update({triangle(i): timeBonuses})
-
-            #locationRule = HasAllCounts({"Time Bonus": timeBonuses,
-            #                             "Extra Bot": bots,
-            #                             "Perma-Perk": (i * 7) // world.scoreChecks,
-            #                             "Perma-Skill": (i * 7) // world.scoreChecks})
             locationRule = (HasAllCounts({"Time Bonus": timeBonuses,
                                          "Extra Bot": bots}) &
                             HasGroup("Perma-Upgrades", (i * 14) // world.scoreChecks))
             locationRule = locationRule | (Has("Time Bonus", timeBonuses) & Has("Glitch Logic"))
-            print(f"{locName}: {locationRule}")
+            #print(f"{locName}: {locationRule}")
 
             world.set_rule(location, locationRule)
 

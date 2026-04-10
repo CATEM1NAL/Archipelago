@@ -11,7 +11,6 @@ from .data_structs import gameModeData
 
 class CrimDawnWebWorld(WebWorld):
     game = "PAYDAY 2: Criminal Dawn"
-    option_groups = crimdawn_options.option_groups
 
 class CrimDawnSettings(settings.Group):
     class PAYDAY2Path(settings.LocalFilePath):
@@ -45,18 +44,21 @@ class CrimDawnWorld(World):
 
     def generate_early(self) -> None:
         if not hasattr(self.multiworld, "re_gen_passthrough"):
-            gameModeDict = { # runLength, scoreChecks
-                "Short Day": gameModeData(4, 75),
-                "Long Day": gameModeData(6, 120),
-                "Pointless Day": gameModeData(0, 85),
-                "Moving Day": gameModeData(0, 130),
-                "Texan Day": gameModeData(4, 100)
+            gameModeDict = { # runLength, scoreChecks, isCampaign
+                "Short Day": gameModeData(4, 75, False),
+                "Long Day": gameModeData(6, 120, False),
+                "Pointless Day": gameModeData(0, 85, False),
+                "Moving Day": gameModeData(0, 130, False),
+                "I Need My Payday Too": gameModeData(6, 75, True),
+                "Greatest Heist Of All" : gameModeData(4, 75, True),
+                "Silk Road" : gameModeData(4, 75, True),
+                "City of Gold": gameModeData(4, 75, True),
+                "Texas Heat": gameModeData(4, 75, True),
             }
             self.goal = self.options.game_mode.get_option_name(self.options.game_mode.value)
-            print(self.options.game_mode.value)
-            print(self.goal)
             self.runLength = gameModeDict[self.goal].runLength
             self.scoreChecks = gameModeDict[self.goal].scoreChecks
+            self.isCampaign = gameModeDict[self.goal].campaign
 
             self.yaml_overrides()
 
@@ -119,5 +121,6 @@ class CrimDawnWorld(World):
         args["run_length"] = self.runLength
         args["score_checks"] = self.scoreChecks
         args["goal"] = self.goal
+        args["campaign"] = self.isCampaign
 
         return args
