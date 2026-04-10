@@ -78,16 +78,7 @@ def createHeistCompletionLocations(world: CrimDawnWorld) -> None:
 
 def createSafeHouseLocations(world: CrimDawnWorld) -> None:
     # Safehouse checks
-    safeHouseTiers = world.runLength
-    if safeHouseTiers == 0:
-        if world.goal == "Pointless Day":
-            safeHouseTiers = 2
-        else:
-            safeHouseTiers = 6
-    elif world.isCampaign:
-        safeHouseTiers = 1
-
-    for i in range(1, safeHouseTiers + 1):
+    for i in range(1, world.safehouseTiers + 1):
         currentTier = Region(f"Safe House Tier {i}", world.player, world.multiworld)
         world.multiworld.regions.append(currentTier)
 
@@ -100,7 +91,7 @@ def createSafeHouseLocations(world: CrimDawnWorld) -> None:
         else:
             world.create_entrance(world.get_region(f"Crime.net"), currentTier, safehouseAccess, f"{23 * i} Coins")
 
-    for i in range(1, safeHouseTiers + 1):
+    for i in range(1, world.safehouseTiers + 1):
         safehouse = world.get_region(f"Safe House Tier {i}")
         for room in safehouseRooms:
             locName = f"{room} (Tier {i})"

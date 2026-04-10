@@ -72,7 +72,7 @@ def update_items(world: CrimDawnWorld) -> None:
 
     maxCoins = math.ceil(2 * (23/3))
     if world.runLength > 0:
-        maxCoins = math.ceil(23/3 * world.runLength)
+        maxCoins = math.ceil(23/3 * world.safehouseTiers)
     elif world.goal == "Moving Day":
         maxCoins = math.ceil(23/3 * 6)
 

@@ -44,25 +44,26 @@ class CrimDawnWorld(World):
 
     def generate_early(self) -> None:
         if not hasattr(self.multiworld, "re_gen_passthrough"):
-            gameModeDict = { # runLength, scoreChecks, isCampaign
-                "Short Day": gameModeData(4, 75, False),
-                "Long Day": gameModeData(6, 120, False),
-                "Pointless Day": gameModeData(0, 85, False),
-                "Moving Day": gameModeData(0, 120, False),
-                "Return Of The Rat": gameModeData(4, 80, True),
-                "Murky Day": gameModeData(4, 80, True),
-                "I Need My Payday Too": gameModeData(5, 80, True),
-                "Greatest Heist Of All": gameModeData(6, 80, True),
-                "Silk Road" : gameModeData(4, 80, True),
-                "City Of Gold": gameModeData(3, 80, True),
-                "Texas Heat": gameModeData(3, 80, True),
-                "Night Of Frights": gameModeData(4, 80, True),
-                "Christmas Special": gameModeData(4, 80, True),
-                "Classics": gameModeData(6, 80, True),
+            gameModeDict = { # runLength, scoreChecks, safehouseTiers, isCampaign
+                "Short Day": gameModeData(4, 75, 4, False),
+                "Long Day": gameModeData(6, 120, 6, False),
+                "Pointless Day": gameModeData(0, 85, 2, False),
+                "Moving Day": gameModeData(0, 130, 6, False),
+                "Return Of The Rat": gameModeData(4, 80, 1, True),
+                "Murky Day": gameModeData(4, 80, 1, True),
+                "I Need My Payday Too": gameModeData(5, 80, 1, True),
+                "Greatest Heist Of All": gameModeData(6, 80, 1, True),
+                "Silk Road" : gameModeData(4, 80, 1, True),
+                "City Of Gold": gameModeData(3, 80, 1, True),
+                "Texas Heat": gameModeData(3, 80, 1, True),
+                "Night Of Frights": gameModeData(4, 80, 1, True),
+                "Christmas Special": gameModeData(4, 80, 1, True),
+                "Classics": gameModeData(6, 80, 1, True),
             }
             self.goal = self.options.game_mode.get_option_name(self.options.game_mode.value)
             self.runLength = gameModeDict[self.goal].runLength
             self.scoreChecks = gameModeDict[self.goal].scoreChecks
+            self.safehouseTiers = gameModeDict[self.goal].safehouseTiers
             self.isCampaign = gameModeDict[self.goal].campaign
 
             self.yaml_overrides()
@@ -75,6 +76,7 @@ class CrimDawnWorld(World):
             self.scoreChecks = slot_data["score_checks"]
             self.botCount = slot_data["diff_scale_count"] - 42
             self.goal = slot_data["goal"]
+            self.safehouseTiers = slot_data["safehouse_tiers"]
             self.isCampaign = slot_data["campaign"]
 
         self.item_name_groups.update({"Perma-Upgrades": set()})
@@ -128,5 +130,6 @@ class CrimDawnWorld(World):
         args["score_checks"] = self.scoreChecks
         args["goal"] = self.goal
         args["campaign"] = self.isCampaign
+        args["safehouse_tiers"] = self.safehouseTiers
 
         return args

@@ -335,7 +335,7 @@ class CrimDawnContext(CommonContext):
         self.runLength = args['slot_data']['run_length']
         self.scoreCaps = args['slot_data']["score_caps"]
         self.campaign = args['slot_data']["campaign"]
-
+        self.safehouseTiers = args['slot_data']["safehouse_tiers"]
 
         self.scribble.writeVariable("goal", self.goal)
         self.scribble.writeVariable("timer_strength", args['slot_data']['progression_pacing'])
@@ -345,6 +345,7 @@ class CrimDawnContext(CommonContext):
         self.scribble.writeVariable("max_diff_items", args['slot_data']['diff_scale_count'])
         self.scribble.writeVariable("slot", self.player_names[self.slot])
         self.scribble.writeVariable("campaign", self.campaign)
+        self.scribble.writeVariable("safehouse_tiers", self.safehouseTiers)
 
         self.deathLinkEnabled = args['slot_data']["death_link"]
         if self.deathLinkEnabled:
@@ -353,7 +354,7 @@ class CrimDawnContext(CommonContext):
         keys = list(self.safehouseIdToName)
         self.safehouseRooms = []
 
-        for i in range(1, self.runLength + 1):
+        for i in range(1, self.safehouseTiers + 1):
             for j in range(23):
                 self.safehouseRooms.append(LOCATION_NAME_TO_ID[f"{self.safehouseIdToName[keys[j]].name} (Tier {i})"])
                 #print(f"{self.safehouseIdToName[keys[j]].name} (Tier {i})")
