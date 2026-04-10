@@ -28,10 +28,10 @@ usefulItemDict: dict[int, itemData] = {
 }
 
 fillerItemDict: dict[int, itemData] = {
-    300: itemData(IC.useful, 18, "Primary Weapon"),
-    301: itemData(IC.filler, 41, "Akimbo"),
-    302: itemData(IC.useful, 23, "Secondary Weapon"),
-    303: itemData(IC.filler, 18, "Melee Weapon"),
+    300: itemData(IC.useful, 5, "Primary Weapon"),
+    301: itemData(IC.filler, 5, "Akimbo"),
+    302: itemData(IC.useful, 5, "Secondary Weapon"),
+    303: itemData(IC.filler, 5, "Melee Weapon"),
     304: itemData(IC.filler, 5, "Throwable"),
     305: itemData(IC.useful, 6, "Armor"),
     306: itemData(IC.useful, 9, "Deployable"),
@@ -39,10 +39,10 @@ fillerItemDict: dict[int, itemData] = {
 }
 
 fillerLimitDict: dict[int, int] = {
-    300: 18,
-    301: 41,
-    302: 23,
-    303: 18,
+    300: 20,
+    301: 44,
+    302: 31,
+    303: 19,
     304: 5,
     305: 6,
     306: 9,
@@ -78,31 +78,29 @@ def update_items(world: CrimDawnWorld) -> None:
 
     usefulItemDict[200] = itemData(itemDict[200][0], maxCoins, *itemDict[200][2:])
 
-    optList = [world.options.primary_weapons, #300
-               world.options.akimbo, #301
-               world.options.secondary_weapons, #302
-               world.options.melee_weapons, #303
-               world.options.throwables] #304
+    #optList = [world.options.primary_weapons, #300
+    #           world.options.akimbo, #301
+    #           world.options.secondary_weapons, #302
+    #           world.options.melee_weapons, #303
+    #           world.options.throwables] #304
 
-    for i, opt in enumerate(optList):
-        fillerItemDict[300+i] = itemData(itemDict[300+i][0], opt.value, *itemDict[300+i][2:])
-        fillerLimitDict[300+i] -= opt
+    #for i, opt in enumerate(optList):
+    #    fillerItemDict[300+i] = itemData(itemDict[300+i][0], opt.value, *itemDict[300+i][2:])
+    #    fillerLimitDict[300+i] -= opt
 
 def get_random_filler_item_name(world: CrimDawnWorld) -> str:
-    fillerType = world.random.choice(["weapon", "upgrade"])
+    fillerType = world.random.random()
 
-    if fillerType == "weapon":
-        item = fillerItemDict[world.random.randint(300, 304)]
-
-    elif fillerType == "upgrade":
+    if fillerType < 0.75: # 75% chance for weapon
+        item = fillerItemDict[world.random.randint(300, 303)]
+    else: # 25% chance for stat boost
         item = fillerItemDict[307]
 
     itemId = ITEM_NAME_TO_ID[item.name]
 
-    if fillerLimitDict[itemId] > 0:
+    if fillerLimitDict[itemId] > 0: # Avoid generating too many weapons for non-DLC players
         fillerLimitDict[itemId] -= 1
-
-    else:
+    else: # Generate stat boosts instead
         item = fillerItemDict[307]
 
     return item.name
@@ -127,7 +125,7 @@ def create_all_items(world: CrimDawnWorld) -> None:
             itemPool.append(world.create_item(item.name))
 
     #Make sure filler doesn't go over number of locations
-    maxItemCount = 0
+    """maxItemCount = 0
     for itemId, item in fillerItemDict.items():
         maxItemCount += item.count
 
@@ -146,7 +144,7 @@ def create_all_items(world: CrimDawnWorld) -> None:
 
     for itemId, item in fillerItemDict.items():
         for i in range(item.count):
-            itemPool.append(world.create_item(item.name))
+            itemPool.append(world.create_item(item.name))"""
 
     unfilledLocations = len(world.multiworld.get_unfilled_locations(world.player))
     fillerCount = unfilledLocations - len(itemPool)

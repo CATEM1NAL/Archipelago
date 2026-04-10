@@ -46,9 +46,9 @@ class CrimDawnWorld(World):
     def generate_early(self) -> None:
         if not hasattr(self.multiworld, "re_gen_passthrough"):
             gameModeDict = { # runLength, scoreChecks
-                "Short Day": gameModeData(4, 90),
-                "Long Day": gameModeData(6, 130),
-                "Pointless Day": gameModeData(0, 80),
+                "Short Day": gameModeData(4, 75),
+                "Long Day": gameModeData(6, 120),
+                "Pointless Day": gameModeData(0, 85),
                 "Moving Day": gameModeData(0, 130),
                 "Texan Day": gameModeData(4, 100)
             }
@@ -60,12 +60,14 @@ class CrimDawnWorld(World):
 
             self.yaml_overrides()
 
+        # YAML-less tracker generation
         elif self.game in self.multiworld.re_gen_passthrough:
             slot_data: dict[str, Any] = self.multiworld.re_gen_passthrough[self.game]
             self.options.progression_pacing.value = slot_data["progression_pacing"]
             self.runLength = slot_data["run_length"]
-            self.options.score_checks.value = slot_data["score_checks"]
+            self.scoreChecks = slot_data["score_checks"]
             self.botCount = slot_data["diff_scale_count"] - 42
+            self.goal = slot_data["goal"]
 
         self.item_name_groups.update({"Perma-Upgrades": set()})
         self.item_name_groups["Perma-Upgrades"].add("Perma-Perk")

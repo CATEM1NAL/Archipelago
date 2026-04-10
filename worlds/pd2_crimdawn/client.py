@@ -37,7 +37,7 @@ class scribble:
     def __init__(self, path):
         self.data = {}
         self.path = path
-        print(f"Scribble is scriblibling {self.path}...")
+        print(f"Scribble is scribing {self.path}...")
 
     def run(self, key):
         try:

@@ -4,14 +4,13 @@ from Options import Choice, TextChoice, PerGameCommonOptions, Range, Toggle, Opt
 
 class GamePace(Choice):
     """
-    The speed at which the world can be played. Slower speeds are more likely to get stuck.
-
     QUICK: Start with 20 minutes, gain 20 with each time bonus.
+    Score caps are higher and less likely to get hard stuck.
 
     STANDARD: Start with 10 minutes, gain 10 with each time bonus.
 
     GLACIAL: Start with 10 minutes, gain 5 with each time bonus.
-    Adds 20 score checks, leading to more spheres and taking longer to goal.
+    Adds 25 score checks, leads to more spheres and takes longer to goal.
     """
 
     display_name = "Progression Pacing"
@@ -33,20 +32,20 @@ class InfiniteTime(DefaultOnToggle):
 class GameMode(Choice):
     """
     SHORT DAY: 4 heists per run, jumping straight to the bigger ones.
-    100 score checks, 4 safe house tiers. Timer caps at 60 minutes.
-    Can take around 8 hours to goal.
+    75 score checks, 4 safe house tiers. Timer caps at 60 minutes.
+    Can take around ?? hours to goal (8 hours on Glacial).
 
     LONG DAY: 6 heists per run, with the first two being smaller scale.
-    130 score checks, 6 safe house tiers. Timer caps at 90 minutes (100 on quick).
-    Can take around 12 hours to goal.
+    120 score checks, 6 safe house tiers. Timer caps at 90 minutes (100 on Quick).
+    Can take around 12 hours to goal (?? hours on Glacial).
 
     POINTLESS DAY: Random heists. Win after maxing out your score.
-    80 score checks, 2 safe house tiers. Timer caps at 100 minutes.
-    Can take around ?? hours to goal.
+    85 score checks, 2 safe house tiers. Timer caps at 100 minutes.
+    Can take around ?? hours to goal (?? hours on Glacial).
 
     MOVING DAY: Random heists. Win after fully upgrading the safe house.
     130 score checks, 6 safe house tiers. Timer caps at 100 minutes.
-    Can take around ?? hours to goal.
+    Can take around ?? hours to goal (?? hours on Glacial).
     """
 
     display_name = "Game Mode"
@@ -181,27 +180,17 @@ class DeathLink(Toggle):
 @dataclass
 class CrimDawnOptions(PerGameCommonOptions):
     progression_pacing: GamePace
-    game_mode: GameMode
     infinite_time: InfiniteTime
+    game_mode: GameMode
     final_difficulty: MaxDiff
     death_link: DeathLink
     saws: AdditionalSaw
-    primary_weapons: PrimaryCount
-    akimbo: AkimboCount
-    secondary_weapons: SecondaryCount
-    melee_weapons: MeleeCount
-    throwables: ThrowableCount
     biglobby: BotCount
 
 option_groups = [
     OptionGroup(
         "Item Generation",
         [AdditionalSaw,
-         PrimaryCount,
-         AkimboCount,
-         SecondaryCount,
-         MeleeCount,
-         ThrowableCount,
          BotCount],
     ),
 ]

@@ -39,6 +39,7 @@ def createAllLocations(world: CrimDawnWorld) -> None:
         createHeistCompletionLocations(world)
     createScoreLocations(world)
     createSafeHouseLocations(world)
+    world.set_completion_rule(Has("Victory"))
 
 def createHeistCompletionLocations(world: CrimDawnWorld) -> None:
     crimenet = world.get_region("Crime.net")
@@ -49,7 +50,8 @@ def createHeistCompletionLocations(world: CrimDawnWorld) -> None:
         heistRegion = world.get_region(f"Heist {i}")
         locName = f"Heist {i} Completed"
         locId = world.location_name_to_id[locName]
-        if i == world.runLength: locId = None
+        if i == world.runLength:
+            locId = None
         location = CrimDawnLocation(world.player, locName, locId, heistRegion)
         location.progress_type = LocationProgressType.PRIORITY
         heistRegion.locations.append(location)
@@ -110,8 +112,6 @@ def createSafeHouseLocations(world: CrimDawnWorld) -> None:
         location = safehouse.get_locations()[0]
         rule = CanReachLocation(location.name) #& CanReachLocation(f"{triangle(world.scoreChecks)} Points")
 
-        world.set_completion_rule(rule)
-
 def createScoreLocations(world: CrimDawnWorld) -> None:
     # Create regions, assign a location to each region, chain entrances together
     firstHeist = world.get_region("Crime.net")
@@ -126,7 +126,6 @@ def createScoreLocations(world: CrimDawnWorld) -> None:
         world.multiworld.regions.append(region)
 
         location = CrimDawnLocation(world.player, locName, locId, region)
-        region.locations.append(location)
 
         bots = (i // (world.scoreChecks // world.botCount))
         #print((i / (world.scoreChecks / world.botCount)) - 1)
@@ -144,8 +143,14 @@ def createScoreLocations(world: CrimDawnWorld) -> None:
 
             elif i == world.scoreChecks:
                 timeBonuses = round(world.itemsForGoal)
-                if world.options.infinite_time:
+                if world.goal == "Pointless Day":
+                    victory = items.CrimDawnItem("Victory", IC.progression, None, world.player)
+                    location = CrimDawnLocation(world.player, locName, None, region)
+                    location.place_locked_item(victory)
+
+                elif world.options.infinite_time:
                     location.place_locked_item(world.create_item("Time Bonus"))
+
 
             else:
                 timeBonuses = 0
@@ -164,6 +169,7 @@ def createScoreLocations(world: CrimDawnWorld) -> None:
 
             world.set_rule(location, locationRule)
 
+        region.locations.append(location)
         if i > 1:
             prevRegion.connect(region, f"{i} points")
         prevRegion = region
@@ -189,5 +195,3 @@ def createScoreLocations(world: CrimDawnWorld) -> None:
 
         victory = items.CrimDawnItem("Victory", IC.progression, None, world.player)
         location.place_locked_item(victory)
-
-        world.set_completion_rule(Has("Victory"))
