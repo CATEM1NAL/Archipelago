@@ -31,9 +31,6 @@ class InfiniteTime(DefaultOnToggle):
 
 class GameMode(Choice):
     """
-    STANDARD MODES
-    These are the primary game modes built around playing random heists.
-
     SHORT DAY: 4 heists per run, jumping straight to the bigger ones.
     75 score checks, 4 safe house tiers. Timer caps at 60 minutes.
     Can take around ?? hours to goal (8 hours on Glacial).
@@ -50,11 +47,27 @@ class GameMode(Choice):
     130 score checks, 6 safe house tiers. Timer caps at 100 minutes.
     Can take around ?? hours to goal (?? hours on Glacial).
 
+    CAMPAIGN: 80 score checks, a single safe house tier, and the heists
+    are fixed. Some of them require DLC to play, so check that you own
+    the required heists before enabling them!
+    """
 
-    CAMPAIGNS
-    The following modes are campaigns. They have 80 score checks, a single
-    safe house tier, and the heists are fixed. Some of them require DLC to play,
-    so check that you own the required heists before enabling them!
+    display_name = "Game Mode"
+
+    option_short_day = 1
+    option_long_day = 2
+    option_pointless_day = 3
+    option_moving_day = 4
+    option_campaign = 100
+
+    default = option_short_day
+
+class Campaign(Choice):
+    """
+    Only used if campaign is selected as the game mode.
+
+    CLASSICS: First World Bank, Heat Street, Panic Room, Green Bridge,
+    Diamond Heist, Slaughterhouse.
 
     RETURN OF THE RAT: Watch Dogs, Firestarter, Rats, Hoxton Revenge.
 
@@ -72,27 +85,20 @@ class GameMode(Choice):
     CITY OF GOLD: Dragon Heist (DLC), Black Cat (DLC), Mountain Master (DLC).
 
     TEXAS HEAT: Midland Ranch (DLC), Hostile Takeover (DLC), Crude Awakening (DLC).
-
-    CLASSICS: First World Bank, Heat Street, Panic Room, Green Bridge,
-    Diamond Heist, Slaughterhouse.
     """
 
-    display_name = "Game Mode"
+    display_name = "Campaign"
 
-    option_short_day = 1
-    option_long_day = 2
-    option_pointless_day = 3
-    option_moving_day = 4
-    option_return_of_the_rat = 100
-    option_murky_day = 101
-    option_i_need_my_payday_too = 102
-    option_greatest_heist_of_all = 103
-    option_silk_road = 104
-    option_city_of_gold = 105
-    option_texas_heat = 106
-    option_classics = 107
+    option_classics = 1
+    option_return_of_the_rat = 2
+    option_murky_day = 3
+    option_i_need_my_payday_too = 4
+    option_greatest_heist_of_all = 5
+    option_silk_road = 6
+    option_city_of_gold = 7
+    option_texas_heat = 8
 
-    default = option_short_day
+    default = option_classics
 
 class BotCount(Toggle):
     """
@@ -219,5 +225,6 @@ class CrimDawnOptions(PerGameCommonOptions):
     progression_pacing: GamePace
     infinite_time: InfiniteTime
     game_mode: GameMode
+    campaign: Campaign
     death_link: DeathLink
     biglobby: BotCount

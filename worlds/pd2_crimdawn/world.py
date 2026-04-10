@@ -61,6 +61,9 @@ class CrimDawnWorld(World):
                 "Classics": gameModeData(6, 80, 1, True),
             }
             self.goal = self.options.game_mode.get_option_name(self.options.game_mode.value)
+            if self.goal == "Campaign":
+                self.goal = self.options.campaign.get_option_name(self.options.campaign.value)
+            print(self.goal)
             self.runLength = gameModeDict[self.goal].runLength
             self.scoreChecks = gameModeDict[self.goal].scoreChecks
             self.safehouseTiers = gameModeDict[self.goal].safehouseTiers
