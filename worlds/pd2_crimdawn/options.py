@@ -31,6 +31,9 @@ class InfiniteTime(DefaultOnToggle):
 
 class GameMode(Choice):
     """
+    STANDARD MODES
+    These are the primary game modes built around playing random heists.
+
     SHORT DAY: 4 heists per run, jumping straight to the bigger ones.
     75 score checks, 4 safe house tiers. Timer caps at 60 minutes.
     Can take around ?? hours to goal (8 hours on Glacial).
@@ -47,6 +50,8 @@ class GameMode(Choice):
     130 score checks, 6 safe house tiers. Timer caps at 100 minutes.
     Can take around ?? hours to goal (?? hours on Glacial).
 
+
+    CAMPAIGNS
     The following modes are campaigns. They have 80 score checks, a single
     safe house tier, and the heists are fixed. Some of them require DLC to play,
     so check that you own the required heists before enabling them!
@@ -58,7 +63,7 @@ class GameMode(Choice):
     I NEED MY PAYDAY TOO: Big Bank (DLC), The Diamond (DLC), Hotline Miami (DLC),
     Hoxton Breakout, Golden Grin Casino (DLC).
 
-    GREATEST HEIST OF ALL: Reservoir Dogs (licensed), Brooklyn Bank,
+    GREATEST HEIST OF ALL: Reservoir Dogs (DLC), Brooklyn Bank,
     Shacklethorne Auction, Breakin' Feds, Hell's Island, White House.
 
     SILK ROAD: Border Crossing (DLC), San Martín Bank (DLC),
