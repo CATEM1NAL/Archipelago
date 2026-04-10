@@ -58,7 +58,7 @@ def createHeistCompletionLocations(world: CrimDawnWorld) -> None:
         heistRegion.locations.append(location)
 
         if i == 1:
-            if world.runLength < 6:
+            if world.runLength < 6 or world.isCampaign:
                 itemsForConnection = math.floor(15 / world.options.progression_pacing.value - 0.5)
             else:
                 itemsForConnection = math.floor(10 / world.options.progression_pacing.value - 0.5)

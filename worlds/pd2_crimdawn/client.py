@@ -367,7 +367,6 @@ class CrimDawnContext(CommonContext):
             }]))
 
     def on_received_items(self, args: dict):
-        print("sdhfashf")
         # for entry in self.items_received:
         for entry in args["items"]:
             try:
@@ -416,7 +415,7 @@ class CrimDawnContext(CommonContext):
                     if id in self.missing_locations:
                         await self.check_locations([id])
 
-            if self.goal == "Millennial Dream":
+            if self.goal == "Moving Day":
                 flag = True
                 for location in self.safehouseLocations:
                     id = LOCATION_NAME_TO_ID[location]
