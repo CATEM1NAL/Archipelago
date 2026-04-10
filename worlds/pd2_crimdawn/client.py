@@ -340,7 +340,6 @@ class CrimDawnContext(CommonContext):
         self.scribble.writeVariable("goal", self.goal)
         self.scribble.writeVariable("timer_strength", args['slot_data']['progression_pacing'])
         self.scribble.writeVariable("run_length", self.runLength)
-        self.scribble.writeVariable("max_diff", args['slot_data']['final_difficulty'])
         self.scribble.writeVariable("score_cap", self.scoreCaps[self.timeBonusReceived])
         self.scribble.writeVariable("max_diff_items", args['slot_data']['diff_scale_count'])
         self.scribble.writeVariable("slot", self.player_names[self.slot])

@@ -214,6 +214,5 @@ class CrimDawnOptions(PerGameCommonOptions):
     progression_pacing: GamePace
     infinite_time: InfiniteTime
     game_mode: GameMode
-    final_difficulty: MaxDiff
     death_link: DeathLink
     biglobby: BotCount

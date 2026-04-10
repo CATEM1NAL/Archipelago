@@ -119,7 +119,6 @@ class CrimDawnWorld(World):
     def fill_slot_data(self) -> Mapping[str, Any]:
         args = self.options.as_dict(
             "progression_pacing",
-            "final_difficulty",
             "death_link"
         )
         args["server_version"] = self.world_version.as_simple_string()
