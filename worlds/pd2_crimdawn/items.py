@@ -9,33 +9,33 @@ if TYPE_CHECKING:
     from .world import CrimDawnWorld
 
 progressionItemDict: dict[int, itemData] = {
-    1: itemData(IC.progression | IC.useful, 0, "Time Bonus"),
-    2: itemData(IC.progression, 2, "Drill Sawgeant"),
-    3: itemData(IC.progression, 3, "Extra Bot"),
-    4: itemData(IC.progression, 2, "Nine Lives"),
-    5: itemData(IC.progression, 7, "Perma-Perk"),
-    6: itemData(IC.progression, 7, "Perma-Skill")
+    1: itemData(IC.progression | IC.useful, 0, "Time Bonus", 100),
+    2: itemData(IC.progression, 2, "Drill Sawgeant", 100),
+    3: itemData(IC.progression, 3, "Extra Bot", 100),
+    4: itemData(IC.progression, 2, "Nine Lives", 100),
+    5: itemData(IC.progression, 7, "Perma-Perk", 100),
+    6: itemData(IC.progression, 7, "Perma-Skill", 100)
 }
 
 trapItemDict: dict[int, itemData] = {
 }
 
 usefulItemDict: dict[int, itemData] = {
-    200: itemData(IC.progression_deprioritized_skip_balancing, 0, "Coins"),
-    201: itemData(IC.useful, 2, "OVE9000 Saw"),
-    202: itemData(IC.useful, 13, "Skill"),
-    203: itemData(IC.useful, 13, "Perk"),
+    200: itemData(IC.progression_deprioritized_skip_balancing, 0, "Coins", 100),
+    201: itemData(IC.useful, 2, "OVE9000 Saw", 100),
+    202: itemData(IC.useful, 13, "Skill", 100),
+    203: itemData(IC.useful, 13, "Perk", 100),
 }
 
 fillerItemDict: dict[int, itemData] = {
-    300: itemData(IC.useful, 5, "Primary Weapon"),
-    301: itemData(IC.filler, 5, "Akimbo"),
-    302: itemData(IC.useful, 5, "Secondary Weapon"),
-    303: itemData(IC.filler, 5, "Melee Weapon"),
-    304: itemData(IC.filler, 5, "Throwable"),
-    305: itemData(IC.useful, 6, "Armor"),
-    306: itemData(IC.useful, 9, "Deployable"),
-    307: itemData(IC.filler, 13, "Stat Boost")
+    300: itemData(IC.useful, 5, "Primary Weapon", 25),
+    301: itemData(IC.filler, 5, "Akimbo", 15),
+    302: itemData(IC.useful, 5, "Secondary Weapon", 25),
+    303: itemData(IC.filler, 5, "Melee Weapon", 5),
+    304: itemData(IC.filler, 7, "Stat Boost", 30),
+    305: itemData(IC.filler, 5, "Throwable", 100),
+    306: itemData(IC.useful, 6, "Armor", 100),
+    307: itemData(IC.useful, 9, "Deployable", 100),
 }
 
 fillerLimitDict: dict[int, int] = {
@@ -43,11 +43,14 @@ fillerLimitDict: dict[int, int] = {
     301: 44,
     302: 31,
     303: 19,
-    304: 5,
-    305: 6,
-    306: 9,
-    307: 0,
+    304: 0,
+    305: 5,
+    306: 6,
+    307: 9,
 }
+
+fillerItems = [fillerItemDict[i] for i in range(300, 305)]
+fillerWeights = [fillerItemDict[i].weight for i in range(300, 305)]
 
 itemDict: dict[int, itemData] = {}
 itemDict.update(progressionItemDict)
@@ -89,21 +92,24 @@ def update_items(world: CrimDawnWorld) -> None:
     #    fillerLimitDict[300+i] -= opt
 
 def get_random_filler_item_name(world: CrimDawnWorld) -> str:
-    fillerType = world.random.random()
+    #fillerType = world.random.randint(1,100)
 
-    if fillerType < 0.75: # 75% chance for weapon
-        item = fillerItemDict[world.random.randint(300, 303)]
-    else: # 25% chance for stat boost
-        item = fillerItemDict[307]
-
+    item = world.random.choices(fillerItems, weights=fillerWeights, k=1)[0]
     itemId = ITEM_NAME_TO_ID[item.name]
 
     if fillerLimitDict[itemId] > 0: # Avoid generating too many weapons for non-DLC players
         fillerLimitDict[itemId] -= 1
     else: # Generate stat boosts instead
-        item = fillerItemDict[307]
+        item = fillerItemDict[304]
 
     return item.name
+
+    #if fillerType < 0.75: # 75% chance for weapon
+    #    item = fillerItemDict[world.random.randint(300, 303)]
+    #else: # 25% chance for stat boost
+    #    item = fillerItemDict[307]
+
+    #return item.name
 
 def create_all_items(world: CrimDawnWorld) -> None:
     #Create progression items
@@ -154,6 +160,13 @@ def create_all_items(world: CrimDawnWorld) -> None:
     fillerCount = unfilledLocations - len(itemPool)
 
     progressionItemDict[3] = itemData(itemDict[3][0], world.botCount, *itemDict[3][2:])
+
+    """fillerItems = [fillerItemDict[i] for i in range(300, 305)]
+    fillerWeights = [fillerItemDict[i].weight for i in range(300, 305)]
+
+    items = world.random.choices(fillerItems, weights=fillerWeights, k=fillerCount)
+    for item in items:
+        itemPool += world.create_item(item.name)"""
 
     itemPool += [world.create_filler() for _ in range(fillerCount)]
 

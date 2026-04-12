@@ -5,6 +5,7 @@ class itemData(NamedTuple):
     classification: ItemClassification
     count: int
     name: str
+    weight: int
 
 class safeHouseData(NamedTuple):
     name: str
