@@ -47,7 +47,7 @@ class GameMode(Choice):
     130 score checks, 6 safe house tiers. Timer caps at 100 minutes.
     Can take around ?? hours to goal (?? hours on Glacial).
 
-    CAMPAIGN: 80 score checks, a single safe house tier, and the heists
+    CAMPAIGN: 90 score checks, a single safe house tier, and the heists
     are fixed. Some of them require DLC to play, so check that you own
     the required heists before enabling them!
     """
