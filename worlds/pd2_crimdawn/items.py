@@ -134,6 +134,8 @@ def create_all_items(world: CrimDawnWorld) -> None:
         for i in range(item.count):
             itemPool.append(world.create_item(item.name))
 
+    world.multiworld.local_early_items[world.player]["Armor"] = 1
+
     #Make sure filler doesn't go over number of locations
     """maxItemCount = 0
     for itemId, item in fillerItemDict.items():
