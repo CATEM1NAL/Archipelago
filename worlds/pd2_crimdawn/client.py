@@ -415,16 +415,6 @@ class CrimDawnContext(CommonContext):
                     if id in self.missing_locations:
                         await self.check_locations([id])
 
-            if self.goal == "Moving Day":
-                flag = True
-                for location in self.safehouseLocations:
-                    id = LOCATION_NAME_TO_ID[location]
-                    if id in self.missing_locations:
-                        flag = False
-                        break
-                if flag:
-                    await self.send_msgs([{"cmd": "StatusUpdate", "status": ClientStatus.CLIENT_GOAL}])
-
         except KeyError as e:
             logger.error(f"Safehouse Key Error: {e}")
 

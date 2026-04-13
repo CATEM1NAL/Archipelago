@@ -1,3 +1,4 @@
+import math
 from collections.abc import Mapping
 from typing import Any, ClassVar
 import settings, logging
@@ -7,10 +8,11 @@ from worlds.AutoWorld import World, WebWorld
 
 from . import items, locations
 from . import options as crimdawn_options
-from .data_structs import gameModeData
 
 class CrimDawnWebWorld(WebWorld):
     game = "PAYDAY 2: Criminal Dawn"
+
+    options_presets = crimdawn_options.presets
 
 class CrimDawnSettings(settings.Group):
     class PAYDAY2Path(settings.LocalFilePath):
@@ -44,30 +46,34 @@ class CrimDawnWorld(World):
 
     def generate_early(self) -> None:
         if not hasattr(self.multiworld, "re_gen_passthrough"):
-            gameModeDict = { # runLength, scoreChecks, safehouseTiers, isCampaign
-                "Short Day": gameModeData(4, 75, 4, False),
-                "Long Day": gameModeData(6, 120, 6, False),
-                "Pointless Day": gameModeData(0, 85, 2, False),
-                "Moving Day": gameModeData(0, 130, 6, False),
-                "Return Of The Rat": gameModeData(4, 90, 1, True),
-                "Murky Day": gameModeData(4, 90, 1, True),
-                "I Need My Payday Too": gameModeData(5, 90, 1, True),
-                "Greatest Heist Of All": gameModeData(6, 90, 1, True),
-                "Silk Road" : gameModeData(4, 90, 1, True),
-                "City Of Gold": gameModeData(3, 90, 1, True),
-                "Texas Heat": gameModeData(3, 90, 1, True),
-                "Night Of Frights": gameModeData(4, 90, 1, True),
-                "Christmas Special": gameModeData(4, 90, 1, True),
-                "Classics": gameModeData(6, 90, 1, True),
+            self.campaignLengthDict = {
+                "Return Of The Rat": 4,
+                "Murky Day": 4,
+                "I Need My Payday Too": 5,
+                "Greatest Heist Of All": 6,
+                "Silk Road" : 4,
+                "City Of Gold": 3,
+                "Texas Heat": 3,
+                "Night Of Frights": 4,
+                "Christmas Special": 4,
+                "Classics": 6,
             }
-            self.goal = self.options.game_mode.get_option_name(self.options.game_mode.value)
+            self.goal = self.options.goal.get_option_name(self.options.goal.value)
+            self.isCampaign = self.goal == "Campaign"
+            self.runLength = self.options.run_length.value
+            if self.goal == "Score":
+                self.runLength = 0
+            self.scoreChecks = self.options.score_checks.value
+            self.safehouseTiers = self.options.safehouse_tiers.value
+
+            """self.goal = self.options.game_mode.get_option_name(self.options.game_mode.value)
             if self.goal == "Campaign":
                 self.goal = self.options.campaign.get_option_name(self.options.campaign.value)
             print(self.goal)
             self.runLength = gameModeDict[self.goal].runLength
             self.scoreChecks = gameModeDict[self.goal].scoreChecks
             self.safehouseTiers = gameModeDict[self.goal].safehouseTiers
-            self.isCampaign = gameModeDict[self.goal].campaign
+            self.isCampaign = gameModeDict[self.goal].campaign"""
 
             self.yaml_overrides()
 
@@ -81,26 +87,55 @@ class CrimDawnWorld(World):
             self.goal = slot_data["goal"]
             self.safehouseTiers = slot_data["safehouse_tiers"]
             self.isCampaign = slot_data["campaign"]
+            self.items_for_goal()
 
         self.item_name_groups.update({"Perma-Upgrades": set()})
         self.item_name_groups["Perma-Upgrades"].add("Perma-Perk")
         self.item_name_groups["Perma-Upgrades"].add("Perma-Skill")
 
+    def items_for_goal(self):
         if self.runLength > 0:
             self.itemsForGoal = round((self.runLength * 15) / self.options.progression_pacing.value - 1)
         else:
             self.itemsForGoal = round(100 / self.options.progression_pacing.value - 1)
-
+            self.options.run_length.visibility = 0
 
     def yaml_overrides(self):
+        if self.goal == "Campaign":
+            self.goal = self.options.campaign.get_option_name(self.options.campaign.value)
+            self.runLength = self.campaignLengthDict[self.goal]
+            self.options.run_length.value = self.runLength
+
+        if not self.isCampaign:
+            self.options.campaign.visibility = 0
+
+        if (self.runLength > 0) and (self.safehouseTiers > self.runLength):
+            self.logger.info(f"{self.player_name} has too many safehouse tiers! "
+                             f"Reducing from {self.safehouseTiers} to {self.runLength}.")
+            self.safehouseTiers = self.runLength
+            self.options.safehouse_tiers.value = self.safehouseTiers
+
         if self.options.progression_pacing == "glacial":
-            self.scoreChecks += 25
+            self.scoreChecks += 10
 
         if self.options.biglobby == 0:
             self.botCount = 3
         else:
-            self.botCount = self.random.randint(7, 21)
+            self.botCount = 19
             self.scoreChecks += 20
+
+        self.items_for_goal()
+
+        self.scoreChecks += self.safehouseTiers * math.ceil(23/3)
+
+        totalChecks = self.runLength + self.scoreChecks + (self.safehouseTiers * 23)
+        totalItems = 98 + self.itemsForGoal + (self.safehouseTiers * math.ceil(23/3))
+
+        if totalChecks < totalItems:
+            self.logger.info(f"{self.player_name} doesn't have enough checks ({totalChecks}/{totalItems})! Adjusting...")
+            self.scoreChecks += totalItems - totalChecks
+            self.options.score_checks.value = self.scoreChecks
+        self.logger.info(f"{self.player_name} has {self.scoreChecks} score checks.")
 
     def create_regions(self) -> None:
         locations.createAllLocations(self)

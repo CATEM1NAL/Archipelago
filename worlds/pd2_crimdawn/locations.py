@@ -1,6 +1,6 @@
 from __future__ import annotations
 from rule_builder.rules import Has, HasGroup, HasAllCounts, CanReachLocation
-from worlds.generic.Rules import forbid_item
+from worlds.generic.Rules import forbid_item, forbid_items_for_player
 
 from typing import TYPE_CHECKING
 from BaseClasses import ItemClassification as IC, Location, Region, LocationProgressType
@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 def triangle(n: int) -> int:
     return n * (n + 1) // 2
 
-maxScoreLocations = (175) + 1
+maxScoreLocations = (178) + 1
 LOCATION_NAME_TO_ID = { f"{triangle(i)} Points" : i for i in range(1, maxScoreLocations) }
 
 safehouseRooms = ["Scarface's Room", "Dallas' Office", "Hoxton's Files", "Clover's Surveillance Center",
@@ -84,12 +84,18 @@ def createSafeHouseLocations(world: CrimDawnWorld) -> None:
 
         safehouseAccess = Has("Coins", math.ceil(23/3 * i)) | (Has("Coins", math.ceil(23/3 * (i - 1) + 1)) & Has("Glitch Logic"))
 
+        if i == world.safehouseTiers:
+            safehouseAccess = Has("Coins", math.ceil(23 / 3 * (i - 1) + 1)) | (Has("Coins", math.ceil(23 / 3 * (i - 1) + 1)) & Has("Glitch Logic"))
+
         #if i == 1:
         #    safehouseAccess = safehouseAccess & CanReachLocation(f"{triangle(12)} Points")
         if world.runLength > 0:
             world.create_entrance(world.get_region(f"Heist {i}"), currentTier, safehouseAccess, f"{23 * i} Coins")
         else:
-            world.create_entrance(world.get_region(f"Crime.net"), currentTier, safehouseAccess, f"{23 * i} Coins")
+            if i == 1:
+                world.create_entrance(world.get_region(f"Crime.net"), currentTier, safehouseAccess, f"{23 * i} Coins")
+            else:
+                world.create_entrance(world.get_region(f"Safe House Tier {i-1}"), currentTier, safehouseAccess, f"{23 * i} Coins")
 
     for i in range(1, world.safehouseTiers + 1):
         safehouse = world.get_region(f"Safe House Tier {i}")
@@ -99,15 +105,8 @@ def createSafeHouseLocations(world: CrimDawnWorld) -> None:
             location = CrimDawnLocation(world.player, locName, locId, safehouse)
             safehouse.locations.append(location)
             forbid_item(location, "Coins", world.player)
-
-    if world.goal == "Moving Day":
-        rule = CanReachLocation(location.name) #& CanReachLocation(f"{triangle(world.scoreChecks)} Points")
-        location = CrimDawnLocation(world.player, "Safehouse Completed", None, safehouse)#safehouse.get_locations()[0]
-        safehouse.locations.append(location)
-
-        world.set_rule(location, rule)
-        victory = items.CrimDawnItem("Victory", IC.progression, None, world.player)
-        location.place_locked_item(victory)
+            if i == 1:
+                forbid_item(location, "Time Bonus", world.player)
 
 def createScoreLocations(world: CrimDawnWorld) -> None:
     # Create regions, assign a location to each region, chain entrances together
@@ -139,7 +138,7 @@ def createScoreLocations(world: CrimDawnWorld) -> None:
 
             elif i == world.scoreChecks:
                 timeBonuses = round(world.itemsForGoal)
-                if world.goal == "Pointless Day":
+                if world.goal == "Score":
                     victory = items.CrimDawnItem("Victory", IC.progression, None, world.player)
                     location = CrimDawnLocation(world.player, locName, None, region)
                     location.place_locked_item(victory)
@@ -153,7 +152,7 @@ def createScoreLocations(world: CrimDawnWorld) -> None:
 
             requiredTimeBonuses.update({triangle(i): timeBonuses})
             locationRule = (HasAllCounts({"Time Bonus": timeBonuses,
-                                         "Extra Bot": bots}) &
+                                          "Extra Bot": bots}) &
                             HasGroup("Perma-Upgrades", (i * 14) // world.scoreChecks))
             locationRule = locationRule | (Has("Time Bonus", timeBonuses) & Has("Glitch Logic"))
             #print(f"{locName}: {locationRule}")

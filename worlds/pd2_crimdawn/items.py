@@ -17,14 +17,14 @@ progressionItemDict: dict[int, itemData] = {
     6: itemData(IC.progression, 7, "Perma-Skill", 100)
 }
 
-trapItemDict: dict[int, itemData] = {
-}
-
 usefulItemDict: dict[int, itemData] = {
     200: itemData(IC.progression_deprioritized_skip_balancing, 0, "Coins", 100),
     201: itemData(IC.useful, 2, "OVE9000 Saw", 100),
     202: itemData(IC.useful, 13, "Skill", 100),
     203: itemData(IC.useful, 13, "Perk", 100),
+    204: itemData(IC.useful, 6, "Armor", 100),
+    205: itemData(IC.useful, 9, "Deployable", 100),
+    206: itemData(IC.filler, 5, "Throwable", 100),
 }
 
 fillerItemDict: dict[int, itemData] = {
@@ -33,9 +33,6 @@ fillerItemDict: dict[int, itemData] = {
     302: itemData(IC.useful, 5, "Secondary Weapon", 25),
     303: itemData(IC.filler, 5, "Melee Weapon", 5),
     304: itemData(IC.filler, 7, "Stat Boost", 30),
-    305: itemData(IC.filler, 5, "Throwable", 100),
-    306: itemData(IC.useful, 6, "Armor", 100),
-    307: itemData(IC.useful, 9, "Deployable", 100),
 }
 
 fillerLimitDict: dict[int, int] = {
@@ -44,9 +41,6 @@ fillerLimitDict: dict[int, int] = {
     302: 31,
     303: 19,
     304: 0,
-    305: 5,
-    306: 6,
-    307: 9,
 }
 
 fillerItems = [fillerItemDict[i] for i in range(300, 305)]
@@ -54,7 +48,6 @@ fillerWeights = [fillerItemDict[i].weight for i in range(300, 305)]
 
 itemDict: dict[int, itemData] = {}
 itemDict.update(progressionItemDict)
-itemDict.update(trapItemDict)
 itemDict.update(usefulItemDict)
 itemDict.update(fillerItemDict)
 
@@ -71,45 +64,21 @@ def update_items(world: CrimDawnWorld) -> None:
         progressionItemDict[1] = itemData(itemDict[1][0], world.itemsForGoal, *itemDict[1][2:])
     world.logger.info(f"{world.player_name} has {world.itemsForGoal} Time Bonuses.")
     progressionItemDict[3] = itemData(itemDict[3][0], world.botCount, *itemDict[3][2:])
-    #progressionItemDict[4] = itemData(itemDict[4][0], world.options.saws, *itemDict[4][2:])
 
-    maxCoins = math.ceil(2 * (23/3))
-    if world.runLength > 0:
-        maxCoins = math.ceil(23/3 * world.safehouseTiers)
-    elif world.goal == "Moving Day":
-        maxCoins = math.ceil(23/3 * 6)
-
+    maxCoins = math.ceil(23/3 * world.safehouseTiers)
     usefulItemDict[200] = itemData(itemDict[200][0], maxCoins, *itemDict[200][2:])
 
-    #optList = [world.options.primary_weapons, #300
-    #           world.options.akimbo, #301
-    #           world.options.secondary_weapons, #302
-    #           world.options.melee_weapons, #303
-    #           world.options.throwables] #304
-
-    #for i, opt in enumerate(optList):
-    #    fillerItemDict[300+i] = itemData(itemDict[300+i][0], opt.value, *itemDict[300+i][2:])
-    #    fillerLimitDict[300+i] -= opt
-
 def get_random_filler_item_name(world: CrimDawnWorld) -> str:
-    #fillerType = world.random.randint(1,100)
-
     item = world.random.choices(fillerItems, weights=fillerWeights, k=1)[0]
     itemId = ITEM_NAME_TO_ID[item.name]
 
-    if fillerLimitDict[itemId] > 0: # Avoid generating too many weapons for non-DLC players
+    # Avoid generating too many weapons for non-DLC players
+    if fillerLimitDict[itemId] > 0:
         fillerLimitDict[itemId] -= 1
     else: # Generate stat boosts instead
         item = fillerItemDict[304]
 
     return item.name
-
-    #if fillerType < 0.75: # 75% chance for weapon
-    #    item = fillerItemDict[world.random.randint(300, 303)]
-    #else: # 25% chance for stat boost
-    #    item = fillerItemDict[307]
-
-    #return item.name
 
 def create_all_items(world: CrimDawnWorld) -> None:
     #Create progression items
@@ -122,10 +91,6 @@ def create_all_items(world: CrimDawnWorld) -> None:
         for i in range(item.count):
             itemPool.append(world.create_item(item.name))
 
-    for itemId, item in trapItemDict.items():
-        for i in range(item.count):
-            itemPool.append(world.create_item(item.name))
-
     for itemId, item in usefulItemDict.items():
         for i in range(item.count):
             itemPool.append(world.create_item(item.name))
@@ -135,6 +100,7 @@ def create_all_items(world: CrimDawnWorld) -> None:
             itemPool.append(world.create_item(item.name))
 
     world.multiworld.local_early_items[world.player]["Armor"] = 1
+    world.multiworld.local_early_items[world.player]["Extra Bot"] = 1
 
     #Make sure filler doesn't go over number of locations
     """maxItemCount = 0

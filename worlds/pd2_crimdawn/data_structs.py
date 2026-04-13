@@ -10,9 +10,3 @@ class itemData(NamedTuple):
 class safeHouseData(NamedTuple):
     name: str
     descId: str
-
-class gameModeData(NamedTuple):
-    runLength: int
-    scoreChecks: int
-    safehouseTiers: int
-    campaign: bool

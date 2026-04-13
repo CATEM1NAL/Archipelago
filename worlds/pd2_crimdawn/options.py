@@ -10,7 +10,7 @@ class GamePace(Choice):
     STANDARD: Start with 10 minutes, gain 10 with each time bonus.
 
     GLACIAL: Start with 10 minutes, gain 5 with each time bonus.
-    Adds 25 score checks, leads to more spheres and takes longer to goal.
+    Adds 10 score checks. Leads to more spheres and takes longer to goal.
     """
 
     display_name = "Progression Pacing"
@@ -25,66 +25,101 @@ class InfiniteTime(DefaultOnToggle):
     """
     Generate an additional time bonus at the final score check.
     After obtaining every time bonus the timer is disabled.
+
+    This has no effect with the 'Score' goal.
     """
 
     display_name = "Infinite Time"
 
-class GameMode(Choice):
+class Goal(Choice):
     """
-    SHORT DAY: 4 heists per run, jumping straight to the bigger ones.
-    75 score checks, 4 safe house tiers. Timer caps at 60 minutes.
-    Can take around ?? hours to goal (8 hours on Glacial).
+    What you need to do to complete the world.
 
-    LONG DAY: 6 heists per run, with the first two being smaller scale.
-    120 score checks, 6 safe house tiers. Timer caps at 90 minutes (100 on Quick).
-    Can take around 12 hours to goal (?? hours on Glacial).
-
-    POINTLESS DAY: Random heists. Win after maxing out your score.
-    85 score checks, 2 safe house tiers. Timer caps at 100 minutes.
-    Can take around ?? hours to goal (?? hours on Glacial).
-
-    MOVING DAY: Random heists. Win after fully upgrading the safe house.
-    130 score checks, 6 safe house tiers. Timer caps at 100 minutes.
-    Can take around ?? hours to goal (?? hours on Glacial).
-
-    CAMPAIGN: 90 score checks, a single safe house tier, and the heists
-    are fixed. Some of them require DLC to play, so check that you own
-    the required heists before enabling them!
+    ORIGINAL: Finish a run consisting of random tiered heists.
+    CAMPAIGN: Finish a preset run with a fixed set of heists.
+    SCORE: Send every score check. Heists are completely random.
     """
 
-    display_name = "Game Mode"
+    display_name = "Goal"
 
-    option_short_day = 1
-    option_long_day = 2
-    option_pointless_day = 3
-    option_moving_day = 4
-    option_campaign = 100
+    option_original = 1
+    option_campaign = 2
+    option_score = 3
 
-    default = option_short_day
+    default = option_original
+
+class RunLength(Range):
+    """
+    Only used if 'Heist' is selected as the goal.
+
+    How many heists you need to finish to win.
+    The final heist is always White House or Crude Awakening (if you own it).
+    """
+
+    display_name = "Run Length"
+
+    range_start = 1
+    range_end = 6
+
+    default = 4
+
+class SafehouseTiers(Range):
+    """
+    How many times you can upgrade the safe house. Adds 8 score checks per tier.
+    Solo worlds can fail to generate if this is too high and there aren't enough score checks.
+    """
+
+    display_name = "Safe House Tiers"
+
+    range_start = 0
+    range_end = 6
+
+    default = 4
+
+class ScoreChecks(Range):
+    """
+    Base number of score checks. Each check requires one more point than the last, so this scales quite fast!
+    This is increased by other options, so the actual number of score checks will often be higher.
+    Solo worlds will fail to generate if this is set too low. 50 is a good starting point.
+    """
+
+    display_name = "Score Checks"
+
+    range_start = 0
+    range_end = 100
+
+    default = 43
 
 class Campaign(Choice):
     """
-    Only used if campaign is selected as the game mode.
+    Only used if 'Campaign' is selected as the goal.
 
-    CLASSICS: First World Bank, Heat Street, Panic Room, Green Bridge,
-    Diamond Heist, Slaughterhouse.
+    You need to own all the DLC in a campaign to be able to play it!
+    If you don't own one of the heists, the game will crash.
 
-    RETURN OF THE RAT: Watch Dogs, Firestarter, Rats, Hoxton Revenge.
+    CLASSICS:
+    First World Bank, Heat Street, Panic Room, Green Bridge, Diamond Heist, Slaughterhouse.
 
-    MURKY DAY: Shadow Raid, Meltdown, Beneath the Mountain (DLC), Henry's Rock.
+    RETURN OF THE RAT:
+    Watch Dogs, Firestarter Day 1, Rats, Hoxton Revenge.
 
-    I NEED MY PAYDAY TOO: Big Bank (DLC), The Diamond (DLC), Hotline Miami (DLC),
-    Hoxton Breakout, Golden Grin Casino (DLC).
+    MURKY DAY:
+    Shadow Raid, Meltdown, Beneath the Mountain (DLC), Henry's Rock.
 
-    GREATEST HEIST OF ALL: Reservoir Dogs (DLC), Brooklyn Bank,
-    Shacklethorne Auction, Breakin' Feds, Hell's Island, White House.
+    I NEED MY PAYDAY TOO:
+    Big Bank (DLC), The Diamond (DLC), Hotline Miami (DLC), Hoxton Breakout, Golden Grin Casino (DLC).
 
-    SILK ROAD: Border Crossing (DLC), San Martín Bank (DLC),
-    Breakfast in Tijuana (DLC), Buluc's Mansion (DLC).
+    GREATEST HEIST OF ALL:
+    Reservoir Dogs (DLC), Brooklyn Bank, Shacklethorne Auction, Breakin' Feds, Hell's Island, White House.
 
-    CITY OF GOLD: Dragon Heist (DLC), Black Cat (DLC), Mountain Master (DLC).
+    SILK ROAD:
+    Border Crossing (DLC), San Martín Bank (DLC), Breakfast in Tijuana (DLC), Buluc's Mansion (DLC).
 
-    TEXAS HEAT: Midland Ranch (DLC), Hostile Takeover (DLC), Crude Awakening (DLC).
+    CITY OF GOLD:
+    Dragon Heist (DLC), Black Cat (DLC), Mountain Master (DLC).
+
+    TEXAS HEAT:
+    Midland Ranch (DLC), Hostile Takeover (DLC), Crude Awakening (DLC).
     """
 
     display_name = "Campaign"
@@ -103,113 +138,11 @@ class Campaign(Choice):
 class BotCount(Toggle):
     """
     Whether BigLobby is installed. Adds 20 extra score checks when enabled.
-    Enabling this increases the number of extra bots from 3 to a number between 7 and 21,
-    however the game may become less stable:
+    Enabling this increases the number of extra bots from 3 all the way up to 21, however the game may become less stable:
     https://modworkshop.net/mod/21582
     """
 
     display_name = "BigLobby"
-
-class AdditionalSaw(Range):
-    """
-    How many OVE9000 saws are in the item pool.
-    The first saw will randomly be a primary or secondary.
-    """
-
-    display_name = "OVE9000 Saws"
-
-    range_start = 0
-    range_end = 2
-
-    default = 2
-
-class PrimaryCount(Range):
-    """
-    The base number of primary weapons the multiworld will try to generate.
-    Actual number may be higher or lower depending on the number of locations available.
-    20 is the most you can have without DLC - extra items will do nothing.
-    """
-
-    display_name = "Primary Weapons"
-
-    range_start = 0
-    range_end = 77
-    default = 10
-
-class AkimboCount(Range):
-    """
-    The base number of akimbos the multiworld will try to generate.
-    Actual number may be higher or lower depending on the number of locations available.
-    44 is the most you can have without DLC - extra items will do nothing.
-    """
-
-    display_name = "Akimbos"
-
-    range_start = 0
-    range_end = 58
-    default = 5
-
-class SecondaryCount(Range):
-    """
-    The base number of secondary weapons the multiworld will try to generate.
-    Actual number may be higher or lower depending on the number of locations available.
-    31 is the most you can have without DLC - extra items will do nothing.
-    """
-
-    display_name = "Secondary Weapons"
-
-    range_start = 0
-    range_end = 78
-    default = 10
-
-class MeleeCount(Range):
-    """
-    The base number of melee weapons the multiworld will try to generate.
-    Actual number may be higher or lower depending on the number of locations available.
-    19 is the most you can have without DLC or achievements - extra items will do nothing.
-    """
-
-    display_name = "Melee Weapons"
-
-    range_start = 0
-    range_end = 94
-    default = 5
-
-class ThrowableCount(Range):
-    """
-    The base number of throwables the multiworld will try to generate.
-    Actual number may be higher or lower depending on the number of locations available.
-    5 is the most you can have without DLC or achievements - extra items will do nothing.
-    """
-
-    display_name = "Throwables"
-
-    range_start = 0
-    range_end = 15
-    default = 5
-
-class MaxDiff(Choice):
-    """
-    The highest difficulty your run can reach.
-
-    This mod can be quite hard early-mid game as you aren't guaranteed to have a good build,
-    but late game you can get INCREDIBLY powerful builds that make high difficulties trivial.
-
-    If you're unsure of what to set this to, I'd recommend starting with
-    the difficulty below the highest you can comfortably play normally.
-    """
-
-    display_name = "Final Difficulty"
-
-    option_normal = 1
-    option_hard = 2
-    option_very_hard = 3
-    option_overkill = 4
-    option_mayhem = 5
-    option_death_wish = 6
-    option_death_sentence = 7
-
-    default = 4
 
 class DeathLink(Toggle):
     """
@@ -224,7 +157,35 @@ class DeathLink(Toggle):
 class CrimDawnOptions(PerGameCommonOptions):
     progression_pacing: GamePace
     infinite_time: InfiniteTime
-    game_mode: GameMode
+    goal: Goal
     campaign: Campaign
+    run_length: RunLength
+    safehouse_tiers: SafehouseTiers
+    score_checks: ScoreChecks
     death_link: DeathLink
     biglobby: BotCount
+
+presets = {
+    "4 Heists": {
+        "goal": 1,
+        "run_length": 4,
+        "safehouse_tiers": 4,
+        "score_checks": 43,
+    },
+    "6 Heists (~8 hours)": {
+        "goal": 1,
+        "run_length": 6,
+        "safehouse_tiers": 6,
+        "score_checks": 52,
+    },
+    "Score": {
+        "goal": 3,
+        "safehouse_tiers": 2,
+        "score_checks": 64,
+    },
+    "Campaign": {
+        "goal": 2,
+        "safehouse_tiers": 1,
+        "score_checks": 77,
+    },
+}
