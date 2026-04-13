@@ -59,7 +59,7 @@ class Campaign(Choice):
     First World Bank, Heat Street, Panic Room, Green Bridge, Diamond Heist, Slaughterhouse.
 
     RETURN OF THE RAT:
-    Watch Dogs, Firestarter Day 1, Rats, Hoxton Revenge.
+    Watchdogs, Firestarter Day 1, Rats, Hoxton Revenge.
 
     MURKY DAY:
     Shadow Raid, Meltdown, Beneath the Mountain (DLC), Henry's Rock.
