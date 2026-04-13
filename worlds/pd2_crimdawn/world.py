@@ -95,9 +95,9 @@ class CrimDawnWorld(World):
 
     def items_for_goal(self):
         if self.runLength > 0:
-            self.itemsForGoal = round((self.runLength * 15) / self.options.progression_pacing.value - 1)
+            self.itemsForGoal = math.floor((self.runLength * 15) / self.options.progression_pacing.value - 0.5)
         else:
-            self.itemsForGoal = round(100 / self.options.progression_pacing.value - 1)
+            self.itemsForGoal = math.floor(100 / self.options.progression_pacing.value - 0.5)
             self.options.run_length.visibility = 0
 
     def yaml_overrides(self):

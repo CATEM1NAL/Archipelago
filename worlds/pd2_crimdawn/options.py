@@ -59,13 +59,13 @@ class Campaign(Choice):
     First World Bank, Heat Street, Panic Room, Green Bridge, Diamond Heist, Slaughterhouse.
 
     RETURN OF THE RAT:
-    Watchdogs, Firestarter Day 1, Rats, Hoxton Revenge.
+    Watchdogs, Firestarter Day 1, Rats, Hoxton Breakout Day 2, Hoxton Revenge.
 
     MURKY DAY:
     Shadow Raid, Meltdown, Beneath the Mountain (DLC), Henry's Rock.
 
     I NEED MY PAYDAY TOO:
-    Big Bank (DLC), The Diamond (DLC), Hotline Miami (DLC), Hoxton Breakout, Golden Grin Casino (DLC).
+    Big Bank (DLC), The Diamond (DLC), Hotline Miami (DLC), Hoxton Breakout Day 1, Golden Grin Casino (DLC).
 
     GREATEST HEIST OF ALL:
     Reservoir Dogs (DLC), Brooklyn Bank, Shacklethorne Auction, Breakin' Feds, Hell's Island, White House.

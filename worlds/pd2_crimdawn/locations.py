@@ -74,7 +74,7 @@ def createHeistCompletionLocations(world: CrimDawnWorld) -> None:
 
             world.create_entrance(world.get_region(f"Heist {i - 1}"), heistRegion, entranceRule, f"Heist {i} Requirements")
 
-        #print(f"Heist {i}: {itemsForConnection} time bonuses ({world.options.progression_pacing.value * (itemsForConnection + 1)} minutes)")
+        print(f"Heist {i}: {itemsForConnection} time bonuses ({world.options.progression_pacing.value * (itemsForConnection + 1)} minutes)")
 
 def createSafeHouseLocations(world: CrimDawnWorld) -> None:
     # Safehouse checks
