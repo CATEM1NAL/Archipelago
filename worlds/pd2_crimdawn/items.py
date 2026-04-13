@@ -100,7 +100,9 @@ def create_all_items(world: CrimDawnWorld) -> None:
             itemPool.append(world.create_item(item.name))
 
     world.multiworld.local_early_items[world.player]["Armor"] = 1
-    world.multiworld.local_early_items[world.player]["Extra Bot"] = 1
+
+    if world.options.early_bot:
+        world.multiworld.local_early_items[world.player]["Extra Bot"] = 1
 
     #Make sure filler doesn't go over number of locations
     """maxItemCount = 0

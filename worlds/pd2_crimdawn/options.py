@@ -48,48 +48,6 @@ class Goal(Choice):
 
     default = option_original
 
-class RunLength(Range):
-    """
-    Only used if 'Heist' is selected as the goal.
-
-    How many heists you need to finish to win.
-    The final heist is always White House or Crude Awakening (if you own it).
-    """
-
-    display_name = "Run Length"
-
-    range_start = 1
-    range_end = 6
-
-    default = 4
-
-class SafehouseTiers(Range):
-    """
-    How many times you can upgrade the safe house. Adds 8 score checks per tier.
-    Solo worlds can fail to generate if this is too high and there aren't enough score checks.
-    """
-
-    display_name = "Safe House Tiers"
-
-    range_start = 0
-    range_end = 6
-
-    default = 4
-
-class ScoreChecks(Range):
-    """
-    Base number of score checks. Each check requires one more point than the last, so this scales quite fast!
-    This is increased by other options, so the actual number of score checks will often be higher.
-    Solo worlds will fail to generate if this is set too low. 50 is a good starting point.
-    """
-
-    display_name = "Score Checks"
-
-    range_start = 0
-    range_end = 100
-
-    default = 43
-
 class Campaign(Choice):
     """
     Only used if 'Campaign' is selected as the goal.
@@ -135,6 +93,56 @@ class Campaign(Choice):
 
     default = option_classics
 
+class RunLength(Range):
+    """
+    Only used if 'Heist' is selected as the goal.
+
+    How many heists you need to finish to win.
+    The final heist is always White House or Crude Awakening (if you own it).
+    """
+
+    display_name = "Run Length"
+
+    range_start = 1
+    range_end = 6
+
+    default = 4
+
+class SafehouseTiers(Range):
+    """
+    How many times you can upgrade the safe house. Adds 8 score checks per tier.
+    Solo worlds can fail to generate if this is too high and there aren't enough score checks.
+    """
+
+    display_name = "Safe House Tiers"
+
+    range_start = 0
+    range_end = 6
+
+    default = 4
+
+class ScoreChecks(Range):
+    """
+    Base number of score checks. Each check requires one more point than the last, so this scales quite fast!
+    This is increased by other options, so the actual number of score checks will often be higher.
+    Solo worlds will fail to generate if this is set too low. 60 is a good starting point.
+    """
+
+    display_name = "Score Checks"
+
+    range_start = 0
+    range_end = 100
+
+    default = 43
+
+class EarlyBot(DefaultOnToggle):
+    """
+    Forces an extra bot to generate in sphere 1, guaranteeing that you get an early bot.
+    This can make the early game significantly easier. If you are playing alone, turning this on is recommended.
+    """
+
+    display_name = "Early Bot"
+
 class BotCount(Toggle):
     """
     Whether BigLobby is installed. Adds 20 extra score checks when enabled.
@@ -163,6 +171,7 @@ class CrimDawnOptions(PerGameCommonOptions):
     safehouse_tiers: SafehouseTiers
     score_checks: ScoreChecks
     death_link: DeathLink
+    early_bot: EarlyBot
     biglobby: BotCount
 
 presets = {
@@ -172,11 +181,11 @@ presets = {
         "safehouse_tiers": 4,
         "score_checks": 43,
     },
-    "6 Heists (~8 hours)": {
+    "6 Heists (~12 hours)": {
         "goal": 1,
         "run_length": 6,
         "safehouse_tiers": 6,
-        "score_checks": 52,
+        "score_checks": 72,
     },
     "Score": {
         "goal": 3,
