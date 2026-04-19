@@ -49,14 +49,16 @@ class CrimDawnWorld(World):
             self.campaignLengthDict = {
                 "Return Of The Rat": 4,
                 "Murky Day": 4,
-                "I Need My Payday Too": 5,
+                "I Need My Payday Too": 6,
                 "Greatest Heist Of All": 6,
                 "Silk Road" : 4,
                 "City Of Gold": 3,
                 "Texas Heat": 3,
                 "Night Of Frights": 4,
-                "Christmas Special": 4,
+                "Holiday Special": 3,
                 "Classics": 6,
+                "You Guys No Fun": 5,
+                "Follow The Money": 6
             }
             self.goal = self.options.goal.get_option_name(self.options.goal.value)
             self.isCampaign = self.goal == "Campaign"
@@ -83,7 +85,7 @@ class CrimDawnWorld(World):
             self.options.progression_pacing.value = slot_data["progression_pacing"]
             self.runLength = slot_data["run_length"]
             self.scoreChecks = slot_data["score_checks"]
-            self.botCount = slot_data["diff_scale_count"] - 42
+            self.botCount = slot_data["diff_scale_count"] - 48
             self.goal = slot_data["goal"]
             self.safehouseTiers = slot_data["safehouse_tiers"]
             self.isCampaign = slot_data["campaign"]
@@ -162,7 +164,7 @@ class CrimDawnWorld(World):
         args["server_version"] = self.world_version.as_simple_string()
         args["seed_name"] = f"cd_{self.multiworld.seed_name}"
         args["score_caps"] = self.locationToScoreCap
-        args["diff_scale_count"] = self.botCount + 42
+        args["diff_scale_count"] = self.botCount + 48
         args["run_length"] = self.runLength
         args["score_checks"] = self.scoreChecks
         args["goal"] = self.goal

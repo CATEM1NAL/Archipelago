@@ -51,12 +51,13 @@ class Goal(Choice):
 class Campaign(Choice):
     """
     Only used if 'Campaign' is selected as the goal.
-
     You need to own all the DLC in a campaign to be able to play it!
-    If you don't own one of the heists, the game will crash.
 
     CLASSICS:
     First World Bank, Heat Street, Panic Room, Green Bridge, Diamond Heist, Slaughterhouse.
+
+    YOU GUYS NO FUN:
+    Four Stores, Mallcrasher, Nightclub, Aftershock, Meltdown.
 
     RETURN OF THE RAT:
     Watchdogs, Firestarter Day 1, Rats, Hoxton Breakout Day 2, Hoxton Revenge.
@@ -78,24 +79,29 @@ class Campaign(Choice):
 
     TEXAS HEAT:
     Midland Ranch (DLC), Hostile Takeover (DLC), Crude Awakening (DLC).
+
+    FOLLOW THE MONEY:
+    Bank Heist: Cash, GO Bank, Brooklyn Bank, San Martín Bank (DLC), First World Bank, Big Bank (DLC).
     """
 
     display_name = "Campaign"
 
     option_classics = 1
-    option_return_of_the_rat = 2
-    option_murky_day = 3
-    option_i_need_my_payday_too = 4
-    option_greatest_heist_of_all = 5
-    option_silk_road = 6
-    option_city_of_gold = 7
-    option_texas_heat = 8
+    option_you_guys_no_fun = 2
+    option_return_of_the_rat = 3
+    option_murky_day = 4
+    option_i_need_my_payday_too = 5
+    option_greatest_heist_of_all = 6
+    option_silk_road = 7
+    option_city_of_gold = 8
+    option_texas_heat = 9
+    option_follow_the_money = 10
 
     default = option_classics
 
 class RunLength(Range):
     """
-    Only used if 'Heist' is selected as the goal.
+    Only used if 'Original' is selected as the goal.
 
     How many heists you need to finish to win.
     The final heist is always White House or Crude Awakening (if you own it).
@@ -138,7 +144,7 @@ class ScoreChecks(Range):
 class EarlyBot(DefaultOnToggle):
     """
     Forces an extra bot to generate in sphere 1, guaranteeing that you get an early bot.
-    This can make the early game significantly easier. If you are playing alone, turning this on is recommended.
+    This can make the early game significantly easier. If you are playing alone, keeping this on is recommended.
     """
 
     display_name = "Early Bot"

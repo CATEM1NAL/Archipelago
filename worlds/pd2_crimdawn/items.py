@@ -10,9 +10,9 @@ if TYPE_CHECKING:
 
 progressionItemDict: dict[int, itemData] = {
     1: itemData(IC.progression | IC.useful, 0, "Time Bonus", 100),
-    2: itemData(IC.progression, 2, "Drill Sawgeant", 100),
+    2: itemData(IC.filler, 0, "THIS ITEM NO LONGER EXISTS", 100),
     3: itemData(IC.progression, 3, "Extra Bot", 100),
-    4: itemData(IC.progression, 2, "Nine Lives", 100),
+    4: itemData(IC.progression, 8, "Nine Lives", 100),
     5: itemData(IC.progression, 7, "Perma-Perk", 100),
     6: itemData(IC.progression, 7, "Perma-Skill", 100)
 }
