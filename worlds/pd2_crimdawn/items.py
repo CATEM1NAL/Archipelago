@@ -9,10 +9,10 @@ if TYPE_CHECKING:
     from .world import CrimDawnWorld
 
 progressionItemDict: dict[int, itemData] = {
-    1: itemData(IC.progression | IC.useful, 0, "Time Bonus", 100),
-    2: itemData(IC.filler, 0, "THIS ITEM NO LONGER EXISTS", 100),
+    1: itemData(IC.progression, 13, "Skill", 100),
+    2: itemData(IC.progression, 13, "Perk", 100),
     3: itemData(IC.progression, 3, "Extra Bot", 100),
-    4: itemData(IC.progression, 8, "Nine Lives", 100),
+    4: itemData(IC.progression, 8, "Extra Life", 100),
     5: itemData(IC.progression, 7, "Perma-Perk", 100),
     6: itemData(IC.progression, 7, "Perma-Skill", 100)
 }
@@ -20,11 +20,9 @@ progressionItemDict: dict[int, itemData] = {
 usefulItemDict: dict[int, itemData] = {
     200: itemData(IC.progression_deprioritized_skip_balancing, 0, "Coins", 100),
     201: itemData(IC.useful, 2, "OVE9000 Saw", 100),
-    202: itemData(IC.useful, 13, "Skill", 100),
-    203: itemData(IC.useful, 13, "Perk", 100),
-    204: itemData(IC.useful, 6, "Armor", 100),
-    205: itemData(IC.useful, 9, "Deployable", 100),
-    206: itemData(IC.filler, 5, "Throwable", 100),
+    202: itemData(IC.useful, 6, "Armor", 100),
+    203: itemData(IC.useful, 9, "Deployable", 100),
+    204: itemData(IC.filler, 5, "Throwable", 100),
 }
 
 fillerItemDict: dict[int, itemData] = {
@@ -58,11 +56,6 @@ class CrimDawnItem(Item):
     game = "PAYDAY 2: Criminal Dawn"
 
 def update_items(world: CrimDawnWorld) -> None:
-    if world.options.progression_pacing == "glacial":
-        progressionItemDict[1] = itemData(itemDict[1][0], world.itemsForGoal - 1, *itemDict[1][2:])
-    else:
-        progressionItemDict[1] = itemData(itemDict[1][0], world.itemsForGoal, *itemDict[1][2:])
-    world.logger.info(f"{world.player_name} has {world.itemsForGoal} Time Bonuses.")
     progressionItemDict[3] = itemData(itemDict[3][0], world.botCount, *itemDict[3][2:])
 
     maxCoins = math.ceil(23/3 * world.safehouseTiers)
@@ -83,10 +76,6 @@ def get_random_filler_item_name(world: CrimDawnWorld) -> str:
 def create_all_items(world: CrimDawnWorld) -> None:
     #Create progression items
     itemPool: list[CrimDawnItem] = []
-
-    if world.options.progression_pacing == "glacial":
-        world.push_precollected(world.create_item("Time Bonus"))
-
     for itemId, item in progressionItemDict.items():
         for i in range(item.count):
             itemPool.append(world.create_item(item.name))
@@ -104,39 +93,10 @@ def create_all_items(world: CrimDawnWorld) -> None:
     if world.options.early_bot:
         world.multiworld.local_early_items[world.player]["Extra Bot"] = 1
 
-    #Make sure filler doesn't go over number of locations
-    """maxItemCount = 0
-    for itemId, item in fillerItemDict.items():
-        maxItemCount += item.count
-
-    while maxItemCount + len(itemPool) > len(world.multiworld.get_unfilled_locations(world.player)):
-        breakCounter = 0
-        for itemId, item in fillerItemDict.items():
-            if item.count > 7:
-                fillerItemDict[itemId] = itemData(itemDict[itemId][0], item.count - 1, *itemDict[itemId][2:])
-                maxItemCount -= 1
-            else:
-                breakCounter += 1
-        if breakCounter == 8:
-            print(world.multiworld.get_unfilled_locations(world.player))
-            world.logger.warning(f"WARNING: {world.player_name} attempted generation of too many items!")
-            break
-
-    for itemId, item in fillerItemDict.items():
-        for i in range(item.count):
-            itemPool.append(world.create_item(item.name))"""
-
     unfilledLocations = len(world.multiworld.get_unfilled_locations(world.player))
     fillerCount = unfilledLocations - len(itemPool)
 
     progressionItemDict[3] = itemData(itemDict[3][0], world.botCount, *itemDict[3][2:])
-
-    """fillerItems = [fillerItemDict[i] for i in range(300, 305)]
-    fillerWeights = [fillerItemDict[i].weight for i in range(300, 305)]
-
-    items = world.random.choices(fillerItems, weights=fillerWeights, k=fillerCount)
-    for item in items:
-        itemPool += world.create_item(item.name)"""
 
     itemPool += [world.create_filler() for _ in range(fillerCount)]
 

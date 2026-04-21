@@ -40,7 +40,7 @@ def createAllLocations(world: CrimDawnWorld) -> None:
         createHeistCompletionLocations(world)
     createScoreLocations(world)
     createSafeHouseLocations(world)
-    world.set_completion_rule(Has("Victory"))
+    world.set_completion_rule(Has("The End"))
 
 def createHeistCompletionLocations(world: CrimDawnWorld) -> None:
     crimenet = world.get_region("Crime.net")
@@ -59,22 +59,18 @@ def createHeistCompletionLocations(world: CrimDawnWorld) -> None:
 
         if i == 1:
             if world.runLength < 6 or world.isCampaign:
-                itemsForConnection = math.floor(15 / world.options.progression_pacing.value - 0.5)
+                itemsForConnection = 7
             else:
-                itemsForConnection = math.floor(10 / world.options.progression_pacing.value - 0.5)
-            world.create_entrance(crimenet, heistRegion, Has("Time Bonus", itemsForConnection),"Start Run")
-            #world.create_entrance(crimenet, heistRegion, None, "Start Run")
-        else: #Create Entrance connecting the heist region to the previous heist region
-            #itemsForConnection = math.floor(world.itemsForGoal / world.options.run_length.value * i)
-            itemsForConnection = math.ceil(((i * 15) / world.options.progression_pacing) - 1)
-            entranceRule = Has("Time Bonus", itemsForConnection)
+                itemsForConnection = 0
+            world.create_entrance(crimenet, heistRegion, HasGroup("Progression", itemsForConnection),"Start Run")
 
-            itemsForGlitchLogic = math.ceil(((i * 10) / world.options.progression_pacing) - 1)
-            entranceRule = entranceRule | (Has("Time Bonus", itemsForGlitchLogic) & Has("Glitch Logic"))
+        else: #Create Entrance connecting the heist region to the previous heist region
+            itemsForConnection = math.ceil(i * (world.itemsForGoal / world.runLength))
+            entranceRule = HasGroup("Progression", itemsForConnection)
 
             world.create_entrance(world.get_region(f"Heist {i - 1}"), heistRegion, entranceRule, f"Heist {i} Requirements")
 
-        print(f"Heist {i}: {itemsForConnection} time bonuses ({world.options.progression_pacing.value * (itemsForConnection + 1)} minutes)")
+        print(f"Heist {i}: {itemsForConnection} progression items ({10 + ((itemsForConnection) * 0.75)} minutes)")
 
 def createSafeHouseLocations(world: CrimDawnWorld) -> None:
     # Safehouse checks
@@ -105,8 +101,6 @@ def createSafeHouseLocations(world: CrimDawnWorld) -> None:
             location = CrimDawnLocation(world.player, locName, locId, safehouse)
             safehouse.locations.append(location)
             forbid_item(location, "Coins", world.player)
-            if i == 1:
-                forbid_item(location, "Time Bonus", world.player)
 
 def createScoreLocations(world: CrimDawnWorld) -> None:
     # Create regions, assign a location to each region, chain entrances together
@@ -123,8 +117,6 @@ def createScoreLocations(world: CrimDawnWorld) -> None:
 
         location = CrimDawnLocation(world.player, locName, locId, region)
 
-        bots = (i // (world.scoreChecks // world.botCount))
-
         if i == 1:
             firstHeist.connect(region, "1 point")
 
@@ -139,23 +131,16 @@ def createScoreLocations(world: CrimDawnWorld) -> None:
             elif i == world.scoreChecks:
                 timeBonuses = round(world.itemsForGoal)
                 if world.goal == "Score":
-                    victory = items.CrimDawnItem("Victory", IC.progression, None, world.player)
+                    victory = items.CrimDawnItem("The End", IC.progression, None, world.player)
                     location = CrimDawnLocation(world.player, locName, None, region)
                     location.place_locked_item(victory)
-
-                elif world.options.infinite_time:
-                    location.place_locked_item(world.create_item("Time Bonus"))
-
 
             else:
                 timeBonuses = 0
 
             requiredTimeBonuses.update({triangle(i): timeBonuses})
-            locationRule = (HasAllCounts({"Time Bonus": timeBonuses,
-                                          "Extra Bot": bots}) &
-                            HasGroup("Perma-Upgrades", (i * 14) // world.scoreChecks))
-            locationRule = locationRule | (Has("Time Bonus", timeBonuses) & Has("Glitch Logic"))
-            #print(f"{locName}: {locationRule}")
+            locationRule = HasGroup("Progression", ((i - 1) * (48 + world.botCount)) // world.scoreChecks)
+            print(f"{locName}: {locationRule}")
 
             world.set_rule(location, locationRule)
 
@@ -176,12 +161,9 @@ def createScoreLocations(world: CrimDawnWorld) -> None:
 
     if world.runLength > 0:
         location = world.get_location(f"Heist {world.runLength} Completed")
-        locationRule = HasAllCounts({"Time Bonus": world.itemsForGoal,
-                                     "Extra Bot": world.botCount,
-                                     "Perma-Perk": 7,
-                                     "Perma-Skill": 7})
+        locationRule = HasGroup("Progression", (48 + world.botCount))
 
         world.set_rule(location, locationRule)
 
-        victory = items.CrimDawnItem("Victory", IC.progression, None, world.player)
+        victory = items.CrimDawnItem("The End", IC.progression, None, world.player)
         location.place_locked_item(victory)

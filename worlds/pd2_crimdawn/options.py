@@ -2,39 +2,15 @@ from dataclasses import dataclass
 
 from Options import Choice, TextChoice, PerGameCommonOptions, Range, Toggle, OptionGroup, DefaultOnToggle
 
-class GamePace(Choice):
-    """
-    QUICK: Start with 20 minutes, gain 20 with each time bonus.
-    Score caps are higher and less likely to get hard stuck.
-
-    STANDARD: Start with 10 minutes, gain 10 with each time bonus.
-
-    GLACIAL: Start with 10 minutes, gain 5 with each time bonus.
-    Adds 10 score checks. Leads to more spheres and takes longer to goal.
-    """
-
-    display_name = "Progression Pacing"
-
-    option_quick = 20
-    option_standard = 10
-    option_glacial = 5
-
-    default = option_standard
-
 class InfiniteTime(DefaultOnToggle):
     """
-    Generate an additional time bonus at the final score check.
-    After obtaining every time bonus the timer is disabled.
-
-    This has no effect with the 'Score' goal.
+    Whether the timer is disabled after obtaining all progression items.
     """
 
     display_name = "Infinite Time"
 
 class Goal(Choice):
     """
-    What you need to do to complete the world.
-
     ORIGINAL: Finish a run consisting of random tiered heists.
     CAMPAIGN: Finish a preset run with a fixed set of heists.
     SCORE: Send every score check. Heists are completely random.
@@ -53,35 +29,16 @@ class Campaign(Choice):
     Only used if 'Campaign' is selected as the goal.
     You need to own all the DLC in a campaign to be able to play it!
 
-    CLASSICS:
-    First World Bank, Heat Street, Panic Room, Green Bridge, Diamond Heist, Slaughterhouse.
-
-    YOU GUYS NO FUN:
-    Four Stores, Mallcrasher, Nightclub, Aftershock, Meltdown.
-
-    RETURN OF THE RAT:
-    Watchdogs, Firestarter Day 1, Rats, Hoxton Breakout Day 2, Hoxton Revenge.
-
-    MURKY DAY:
-    Shadow Raid, Meltdown, Beneath the Mountain (DLC), Henry's Rock.
-
-    I NEED MY PAYDAY TOO:
-    Big Bank (DLC), The Diamond (DLC), Hotline Miami (DLC), Hoxton Breakout Day 1, Golden Grin Casino (DLC).
-
-    GREATEST HEIST OF ALL:
-    Reservoir Dogs (DLC), Brooklyn Bank, Shacklethorne Auction, Breakin' Feds, Hell's Island, White House.
-
-    SILK ROAD:
-    Border Crossing (DLC), San Martín Bank (DLC), Breakfast in Tijuana (DLC), Buluc's Mansion (DLC).
-
-    CITY OF GOLD:
-    Dragon Heist (DLC), Black Cat (DLC), Mountain Master (DLC).
-
-    TEXAS HEAT:
-    Midland Ranch (DLC), Hostile Takeover (DLC), Crude Awakening (DLC).
-
-    FOLLOW THE MONEY:
-    Bank Heist: Cash, GO Bank, Brooklyn Bank, San Martín Bank (DLC), First World Bank, Big Bank (DLC).
+    CLASSICS: First World Bank, Heat Street, Panic Room, Green Bridge, Diamond Heist, Slaughterhouse.
+    YOU GUYS NO FUN: Four Stores, Mallcrasher, Nightclub, Aftershock, Meltdown.
+    RETURN OF THE RAT: Watchdogs, Firestarter Day 1, Rats, Hoxton Breakout Day 2, Hoxton Revenge.
+    MURKY DAY: Shadow Raid, Meltdown, Beneath the Mountain (DLC), Henry's Rock.
+    I NEED MY PAYDAY TOO: Big Bank (DLC), The Diamond (DLC), Hotline Miami (DLC), Hoxton Breakout Day 1, Golden Grin Casino (DLC).
+    GREATEST HEIST OF ALL: Reservoir Dogs (DLC), Brooklyn Bank, Shacklethorne Auction, Breakin' Feds, Hell's Island, White House.
+    SILK ROAD: Border Crossing (DLC), San Martín Bank (DLC), Breakfast in Tijuana (DLC), Buluc's Mansion (DLC).
+    CITY OF GOLD: Dragon Heist (DLC), Black Cat (DLC), Mountain Master (DLC).
+    TEXAS HEAT: Midland Ranch (DLC), Hostile Takeover (DLC), Crude Awakening (DLC).
+    FOLLOW THE MONEY: Bank Heist: Cash, GO Bank, Brooklyn Bank, San Martín Bank (DLC), First World Bank, Big Bank (DLC).
     """
 
     display_name = "Campaign"
@@ -131,7 +88,7 @@ class ScoreChecks(Range):
     """
     Base number of score checks. Each check requires one more point than the last, so this scales quite fast!
     This is increased by other options, so the actual number of score checks will often be higher.
-    Solo worlds will fail to generate if this is set too low. 60 is a good starting point.
+    Solo worlds will fail to generate if this is set too low. 60 is a good starting point!
     """
 
     display_name = "Score Checks"
@@ -143,8 +100,8 @@ class ScoreChecks(Range):
 
 class EarlyBot(DefaultOnToggle):
     """
-    Forces an extra bot to generate in sphere 1, guaranteeing that you get an early bot.
-    This can make the early game significantly easier. If you are playing alone, keeping this on is recommended.
+    Force a bot to generate in sphere 1, guaranteeing that you get an early bot.
+    This can make the early game significantly easier. If you are playing alone, keeping this on is recommended!
     """
 
     display_name = "Early Bot"
@@ -169,13 +126,12 @@ class DeathLink(Toggle):
 
 @dataclass
 class CrimDawnOptions(PerGameCommonOptions):
-    progression_pacing: GamePace
-    infinite_time: InfiniteTime
     goal: Goal
     campaign: Campaign
     run_length: RunLength
-    safehouse_tiers: SafehouseTiers
     score_checks: ScoreChecks
+    safehouse_tiers: SafehouseTiers
+    infinite_time: InfiniteTime
     death_link: DeathLink
     early_bot: EarlyBot
     biglobby: BotCount

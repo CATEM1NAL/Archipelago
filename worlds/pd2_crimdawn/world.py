@@ -68,15 +68,6 @@ class CrimDawnWorld(World):
             self.scoreChecks = self.options.score_checks.value
             self.safehouseTiers = self.options.safehouse_tiers.value
 
-            """self.goal = self.options.game_mode.get_option_name(self.options.game_mode.value)
-            if self.goal == "Campaign":
-                self.goal = self.options.campaign.get_option_name(self.options.campaign.value)
-            print(self.goal)
-            self.runLength = gameModeDict[self.goal].runLength
-            self.scoreChecks = gameModeDict[self.goal].scoreChecks
-            self.safehouseTiers = gameModeDict[self.goal].safehouseTiers
-            self.isCampaign = gameModeDict[self.goal].campaign"""
-
             self.yaml_overrides()
 
         # YAML-less tracker generation
@@ -85,22 +76,19 @@ class CrimDawnWorld(World):
             self.options.progression_pacing.value = slot_data["progression_pacing"]
             self.runLength = slot_data["run_length"]
             self.scoreChecks = slot_data["score_checks"]
-            self.botCount = slot_data["diff_scale_count"] - 48
+            self.itemsForGoal = slot_data["progression_items"]
+            self.botCount = slot_data["progression_items"] - 48
             self.goal = slot_data["goal"]
             self.safehouseTiers = slot_data["safehouse_tiers"]
             self.isCampaign = slot_data["campaign"]
-            self.items_for_goal()
 
-        self.item_name_groups.update({"Perma-Upgrades": set()})
-        self.item_name_groups["Perma-Upgrades"].add("Perma-Perk")
-        self.item_name_groups["Perma-Upgrades"].add("Perma-Skill")
-
-    def items_for_goal(self):
-        if self.runLength > 0:
-            self.itemsForGoal = math.floor((self.runLength * 15) / self.options.progression_pacing.value - 0.5)
-        else:
-            self.itemsForGoal = math.floor(100 / self.options.progression_pacing.value - 0.5)
-            self.options.run_length.visibility = 0
+        self.item_name_groups.update({"Progression": set()})
+        self.item_name_groups["Progression"].add("Perma-Perk")
+        self.item_name_groups["Progression"].add("Perma-Skill")
+        self.item_name_groups["Progression"].add("Skill")
+        self.item_name_groups["Progression"].add("Perk")
+        self.item_name_groups["Progression"].add("Extra Bot")
+        self.item_name_groups["Progression"].add("Extra Life")
 
     def yaml_overrides(self):
         if self.goal == "Campaign":
@@ -117,21 +105,18 @@ class CrimDawnWorld(World):
             self.safehouseTiers = self.runLength
             self.options.safehouse_tiers.value = self.safehouseTiers
 
-        if self.options.progression_pacing == "glacial":
-            self.scoreChecks += 10
-
         if self.options.biglobby == 0:
             self.botCount = 3
         else:
             self.botCount = 19
             self.scoreChecks += 20
 
-        self.items_for_goal()
+        self.itemsForGoal = self.botCount + 48
 
         self.scoreChecks += self.safehouseTiers * math.ceil(23/3)
 
         totalChecks = self.runLength + self.scoreChecks + (self.safehouseTiers * 23)
-        totalItems = 98 + self.itemsForGoal + (self.safehouseTiers * math.ceil(23/3))
+        totalItems = 98 + (self.safehouseTiers * math.ceil(23/3))
 
         if totalChecks < totalItems:
             self.logger.info(f"{self.player_name} doesn't have enough checks ({totalChecks}/{totalItems})! Adjusting...")
@@ -158,13 +143,13 @@ class CrimDawnWorld(World):
 
     def fill_slot_data(self) -> Mapping[str, Any]:
         args = self.options.as_dict(
-            "progression_pacing",
-            "death_link"
+            "death_link",
+            "infinite_time"
         )
         args["server_version"] = self.world_version.as_simple_string()
         args["seed_name"] = f"cd_{self.multiworld.seed_name}"
         args["score_caps"] = self.locationToScoreCap
-        args["diff_scale_count"] = self.botCount + 48
+        args["progression_items"] = self.botCount + 48
         args["run_length"] = self.runLength
         args["score_checks"] = self.scoreChecks
         args["goal"] = self.goal
