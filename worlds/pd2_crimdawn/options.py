@@ -96,7 +96,7 @@ class ScoreChecks(Range):
     range_start = 0
     range_end = 100
 
-    default = 43
+    default = 68
 
 class EarlyBot(DefaultOnToggle):
     """

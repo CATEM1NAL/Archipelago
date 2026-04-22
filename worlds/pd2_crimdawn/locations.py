@@ -1,6 +1,6 @@
 from __future__ import annotations
 from rule_builder.rules import Has, HasGroup, HasAllCounts, CanReachLocation
-from worlds.generic.Rules import forbid_item, forbid_items_for_player
+from worlds.generic.Rules import forbid_item
 
 from typing import TYPE_CHECKING
 from BaseClasses import ItemClassification as IC, Location, Region, LocationProgressType

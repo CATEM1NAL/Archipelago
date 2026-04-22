@@ -75,7 +75,7 @@ class scrungle:
                      f"{slotName} doesn't have a razor mind.",
                      f"{slotName} got caught up in that Kataru business.",
                      f"The escape van left {slotName} behind.",
-                     f"{slotName} was overwhelmed by DLC.",
+                     f"{slotName} was consumed by DLC.",
                      f"Scrungle found {slotName}. Nobody escapes Scrungle.",
                      f"It's not {slotName}'s fault, they just had a bad build.",
                      f"If {slotName} had the {random.choice(funnyWeapons)}, that wouldn't have happened."]
@@ -337,11 +337,10 @@ class CrimDawnContext(CommonContext):
         self.campaign = args['slot_data']["campaign"]
         self.safehouseTiers = args['slot_data']["safehouse_tiers"]
 
+        self.scribble.writeVariable("deathlink_state", args['slot_data']['death_link'])
         self.scribble.writeVariable("goal", self.goal)
-        self.scribble.writeVariable("timer_strength", args['slot_data']['progression_pacing'])
         self.scribble.writeVariable("run_length", self.runLength)
-        self.scribble.writeVariable("score_cap", self.scoreCaps[self.timeBonusReceived])
-        self.scribble.writeVariable("max_diff_items", args['slot_data']['diff_scale_count'])
+        self.scribble.writeVariable("max_progression_items", args['slot_data']['progression_items'])
         self.scribble.writeVariable("slot", self.player_names[self.slot])
         self.scribble.writeVariable("campaign", self.campaign)
         self.scribble.writeVariable("safehouse_tiers", self.safehouseTiers)
@@ -381,15 +380,6 @@ class CrimDawnContext(CommonContext):
                 continue
 
             self.scribble.run(item.name)
-
-            if item.name == "Time Bonus":
-                #print(f"{self.timeBonusReceived}: {self.scoreCaps}")
-                self.timeBonusReceived += 1
-                if self.timeBonusReceived < len(self.scoreCaps):
-                    self.scribble.writeVariable("score_cap", self.scoreCaps[self.timeBonusReceived])
-                    logger.info(f"Score cap increased to {self.scoreCaps[self.timeBonusReceived]}!")
-                else:
-                    self.scribble.writeVariable("score_cap", self.scoreCaps[-1])
 
     def getN(self, score):
         return math.floor((math.sqrt(1 + 8 * score) - 1) / 2)
