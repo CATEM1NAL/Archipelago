@@ -27,10 +27,18 @@ class CrimDawnCommandProcessor(ClientCommandProcessor):
     def _cmd_score(self):
         """See your current score and progress to next check."""
         if isinstance(self.ctx, CrimDawnContext):
+            for i in range(1, self.ctx.scoreChecks + 1):
+                ReqItems = (i - 1) * self.ctx.maxProgressionItems // self.ctx.scoreChecks
+                if ReqItems > self.ctx.progressionItems:
+                    #Break when we find a location we cannot access
+                    break
+
+            scoreCap = triangle(i - 1)
             nextScoreCheck = triangle(self.ctx.n + 1)
-            logger.info(f"Current score: {self.ctx.score}/{self.ctx.scoreCaps[self.ctx.timeBonusReceived]}. "
+
+            logger.info(f"Current score: {self.ctx.score}/{scoreCap}. "
                         f"Next check at {nextScoreCheck} points ({nextScoreCheck - self.ctx.score} more).\n"
-                        f"Sent {100 * (self.ctx.score / self.ctx.scoreCaps[-1]):.2f}% of total score checks.")
+                        f"Sent {100 * (self.ctx.score / triangle(self.ctx.scoreChecks)):.2f}% of total score checks.")
 
 # scribble likes to write
 class scribble:
@@ -158,8 +166,8 @@ class CrimDawnContext(CommonContext):
 
     def __init__(self, server_address, password):
         super().__init__(server_address, password)
-        self.score = 0
         self.n = 0
+        self.score = 0
         self.scrungle_task = None
         self.deathLinkPending = False
         self.createRoomLoc = False
@@ -251,7 +259,7 @@ class CrimDawnContext(CommonContext):
             self.scrungle_task = None
 
         version = CrimDawnWorld.world_version.as_simple_string()
-        self.timeBonusReceived = 0
+        self.progressionItems = 0
 
         # Error checking
         if version != args['slot_data']['server_version']:
@@ -333,19 +341,22 @@ class CrimDawnContext(CommonContext):
 
         self.goal = args['slot_data']['goal']
         self.runLength = args['slot_data']['run_length']
-        self.scoreCaps = args['slot_data']["score_caps"]
+        self.scoreChecks = args['slot_data']['score_checks']
+        self.maxProgressionItems = args['slot_data']['progression_items']
         self.campaign = args['slot_data']["campaign"]
         self.safehouseTiers = args['slot_data']["safehouse_tiers"]
+        self.deathLinkEnabled = args['slot_data']["death_link"]
 
-        self.scribble.writeVariable("deathlink_state", args['slot_data']['death_link'])
+        self.scribble.writeVariable("deathlink_state", self.deathLinkEnabled)
         self.scribble.writeVariable("goal", self.goal)
         self.scribble.writeVariable("run_length", self.runLength)
-        self.scribble.writeVariable("max_progression_items", args['slot_data']['progression_items'])
+        self.scribble.writeVariable("max_progression_items", self.maxProgressionItems)
         self.scribble.writeVariable("slot", self.player_names[self.slot])
         self.scribble.writeVariable("campaign", self.campaign)
         self.scribble.writeVariable("safehouse_tiers", self.safehouseTiers)
+        self.scribble.writeVariable("score_checks", self.scoreChecks)
+        self.scribble.writeVariable("infinite_time", args['slot_data']['infinite_time'])
 
-        self.deathLinkEnabled = args['slot_data']["death_link"]
         if self.deathLinkEnabled:
             asyncio.create_task(self.update_death_link(True))
 
@@ -366,7 +377,8 @@ class CrimDawnContext(CommonContext):
             }]))
 
     def on_received_items(self, args: dict):
-        # for entry in self.items_received:
+        progressionItems = ["Skill", "Perk", "Perma-Skill", "Perma-Perk", "Extra Life", "Extra Bot"]
+
         for entry in args["items"]:
             try:
                 item = self.itemDict[entry.item]
@@ -378,6 +390,9 @@ class CrimDawnContext(CommonContext):
                 logger.error(e)
                 logger.error(f"FATAL ERROR: {entry.item}")
                 continue
+
+            if item.name in progressionItems:
+                self.progressionItems += 1
 
             self.scribble.run(item.name)
 
@@ -412,7 +427,7 @@ class CrimDawnContext(CommonContext):
     def on_deathlink(self, data: dict):
         if self.deathLinkPending:
             return
-        self.scribble.writeVariable("deathlink", math.floor(time.time()))
+        self.scribble.writeVariable("deathlink_time", math.floor(time.time()))
         super().on_deathlink(data)
         asyncio.create_task(self.resetDeathLinkFlag())
 

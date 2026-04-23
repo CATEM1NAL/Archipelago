@@ -140,7 +140,7 @@ def createScoreLocations(world: CrimDawnWorld) -> None:
 
             requiredTimeBonuses.update({triangle(i): timeBonuses})
             locationRule = HasGroup("Progression", ((i - 1) * (48 + world.botCount)) // world.scoreChecks)
-            print(f"{locName}: {locationRule}")
+            print(f"{locName}: {locationRule}, {((i - 1) * (48 + world.botCount)) // world.scoreChecks}")
 
             world.set_rule(location, locationRule)
 

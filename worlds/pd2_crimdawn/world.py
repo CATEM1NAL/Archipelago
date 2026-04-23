@@ -47,7 +47,7 @@ class CrimDawnWorld(World):
     def generate_early(self) -> None:
         if not hasattr(self.multiworld, "re_gen_passthrough"):
             self.campaignLengthDict = {
-                "Return Of The Rat": 4,
+                "Return Of The Rat": 5,
                 "Murky Day": 4,
                 "I Need My Payday Too": 6,
                 "Greatest Heist Of All": 6,
@@ -73,11 +73,10 @@ class CrimDawnWorld(World):
         # YAML-less tracker generation
         elif self.game in self.multiworld.re_gen_passthrough:
             slot_data: dict[str, Any] = self.multiworld.re_gen_passthrough[self.game]
-            self.options.progression_pacing.value = slot_data["progression_pacing"]
             self.runLength = slot_data["run_length"]
             self.scoreChecks = slot_data["score_checks"]
             self.itemsForGoal = slot_data["progression_items"]
-            self.botCount = slot_data["progression_items"] - 48
+            self.botCount = slot_data["bot_count"]
             self.goal = slot_data["goal"]
             self.safehouseTiers = slot_data["safehouse_tiers"]
             self.isCampaign = slot_data["campaign"]
@@ -111,7 +110,7 @@ class CrimDawnWorld(World):
             self.botCount = 19
             self.scoreChecks += 20
 
-        self.itemsForGoal = self.botCount + 48
+        self.itemsForGoal = 51
 
         self.scoreChecks += self.safehouseTiers * math.ceil(23/3)
 
@@ -149,11 +148,12 @@ class CrimDawnWorld(World):
         args["server_version"] = self.world_version.as_simple_string()
         args["seed_name"] = f"cd_{self.multiworld.seed_name}"
         args["score_caps"] = self.locationToScoreCap
-        args["progression_items"] = self.botCount + 48
+        args["progression_items"] = 51
         args["run_length"] = self.runLength
         args["score_checks"] = self.scoreChecks
         args["goal"] = self.goal
         args["campaign"] = self.isCampaign
         args["safehouse_tiers"] = self.safehouseTiers
+        args["bot_count"] = self.botCount
 
         return args
