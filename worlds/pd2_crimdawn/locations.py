@@ -60,10 +60,12 @@ def createHeistCompletionLocations(world: CrimDawnWorld) -> None:
         heistRegion.locations.append(location)
 
         if i == 1:
-            if world.runLength < 6 or world.isCampaign:
-                itemsForConnection = math.ceil(5 / timePerUpgrade)
-            else:
+            instantProgressCampaigns = ["You Guys No Fun", "Murky Day"]
+            if world.runLength == 6 or world.goal in instantProgressCampaigns:
                 itemsForConnection = 0
+            else:
+                itemsForConnection = math.ceil(5 / timePerUpgrade)
+
             world.create_entrance(crimenet, heistRegion, HasGroup("Progression", itemsForConnection),"Start Run")
 
         else: #Create Entrance connecting the heist region to the previous heist region
