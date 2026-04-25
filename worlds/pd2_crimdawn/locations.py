@@ -44,6 +44,8 @@ def createAllLocations(world: CrimDawnWorld) -> None:
 
 def createHeistCompletionLocations(world: CrimDawnWorld) -> None:
     crimenet = world.get_region("Crime.net")
+    timeToRunLength = [106, 6, 18, 26, 35, 44, 47]
+    timePerUpgrade = timeToRunLength[world.runLength] / 60
 
     # Heist completion checks
     for i in range(1, world.runLength + 1):
@@ -59,7 +61,7 @@ def createHeistCompletionLocations(world: CrimDawnWorld) -> None:
 
         if i == 1:
             if world.runLength < 6 or world.isCampaign:
-                itemsForConnection = 7
+                itemsForConnection = math.ceil(5 / timePerUpgrade)
             else:
                 itemsForConnection = 0
             world.create_entrance(crimenet, heistRegion, HasGroup("Progression", itemsForConnection),"Start Run")
@@ -70,7 +72,7 @@ def createHeistCompletionLocations(world: CrimDawnWorld) -> None:
 
             world.create_entrance(world.get_region(f"Heist {i - 1}"), heistRegion, entranceRule, f"Heist {i} Requirements")
 
-        print(f"Heist {i}: {itemsForConnection} progression items ({10 + ((itemsForConnection) * 0.75)} minutes)")
+        print(f"Heist {i}: {itemsForConnection} progression items ({10 + ((itemsForConnection) * timePerUpgrade)} minutes)")
 
 def createSafeHouseLocations(world: CrimDawnWorld) -> None:
     # Safehouse checks
@@ -78,7 +80,7 @@ def createSafeHouseLocations(world: CrimDawnWorld) -> None:
         currentTier = Region(f"Safe House Tier {i}", world.player, world.multiworld)
         world.multiworld.regions.append(currentTier)
 
-        safehouseAccess = Has("Coins", math.ceil(23/3 * i)) | (Has("Coins", math.ceil(23/3 * (i - 1) + 1)) & Has("Glitch Logic"))
+        safehouseAccess = Has("Coins", math.ceil(23 / 3 * i)) | (Has("Coins", math.ceil(23 / 3 * (i - 1) + 1)) & Has("Glitch Logic"))
 
         if i == world.safehouseTiers:
             safehouseAccess = Has("Coins", math.ceil(23 / 3 * (i - 1) + 1)) | (Has("Coins", math.ceil(23 / 3 * (i - 1) + 1)) & Has("Glitch Logic"))
@@ -140,7 +142,7 @@ def createScoreLocations(world: CrimDawnWorld) -> None:
 
             requiredTimeBonuses.update({triangle(i): timeBonuses})
             locationRule = HasGroup("Progression", ((i - 1) * (48 + world.botCount)) // world.scoreChecks)
-            print(f"{locName}: {locationRule}, {((i - 1) * (48 + world.botCount)) // world.scoreChecks}")
+            #print(f"{locName}: {locationRule}, {((i - 1) * (48 + world.botCount)) // world.scoreChecks}")
 
             world.set_rule(location, locationRule)
 

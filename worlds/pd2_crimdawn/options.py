@@ -74,7 +74,7 @@ class RunLength(Range):
 class SafehouseTiers(Range):
     """
     How many times you can upgrade the safe house. Adds 8 score checks per tier.
-    Solo worlds can fail to generate if this is too high and there aren't enough score checks.
+    The 'Score' goal can fail to generate if this is too high.
     """
 
     display_name = "Safe House Tiers"
@@ -137,13 +137,13 @@ class CrimDawnOptions(PerGameCommonOptions):
     biglobby: BotCount
 
 presets = {
-    "4 Heists (~8 hours)": {
+    "4 Heists (~? hours)": {
         "goal": 1,
         "run_length": 4,
         "safehouse_tiers": 4,
         "score_checks": 68,
     },
-    "6 Heists (~12 hours)": {
+    "6 Heists (~8 hours)": {
         "goal": 1,
         "run_length": 6,
         "safehouse_tiers": 6,
@@ -154,7 +154,7 @@ presets = {
         "safehouse_tiers": 2,
         "score_checks": 64,
     },
-    "Campaign": {
+    "Campaign (~4 hours)": {
         "goal": 2,
         "safehouse_tiers": 1,
         "score_checks": 77,

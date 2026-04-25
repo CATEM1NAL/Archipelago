@@ -141,10 +141,7 @@ class CrimDawnWorld(World):
         return items.get_random_filler_item_name(self)
 
     def fill_slot_data(self) -> Mapping[str, Any]:
-        args = self.options.as_dict(
-            "death_link",
-            "infinite_time"
-        )
+        args = dict()
         args["server_version"] = self.world_version.as_simple_string()
         args["seed_name"] = f"cd_{self.multiworld.seed_name}"
         args["score_caps"] = self.locationToScoreCap
@@ -155,5 +152,7 @@ class CrimDawnWorld(World):
         args["campaign"] = self.isCampaign
         args["safehouse_tiers"] = self.safehouseTiers
         args["bot_count"] = self.botCount
+        args["infinite_time"] = bool(self.options.infinite_time)
+        args["death_link"] = bool(self.options.death_link)
 
         return args
