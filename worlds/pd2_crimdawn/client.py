@@ -70,7 +70,6 @@ class scrungle:
         modSave = load_json_file(self.path)
         prevScore = 0
         prevHeistsWon = 0
-        prevRun = -1
         lastChatTime = math.floor(time.time())
         lastModTime = 0
         slotName = self.context.player_names[self.context.slot]
@@ -101,7 +100,7 @@ class scrungle:
                         try:
                             modSave = load_json_file(self.path)
                             score = modSave["game"]["score"]
-                            run = modSave["game"]["run"]
+                            deathLinkTime = modSave["game"]["deathlink_time"]
                             heistsWon = modSave["game"]["heists_won"]
 
                             if score > prevScore:
@@ -119,11 +118,8 @@ class scrungle:
                                 if 0 < self.context.runLength == heistsWon:
                                     await self.context.send_msgs([{"cmd": "StatusUpdate", "status": ClientStatus.CLIENT_GOAL}])
 
-                            if prevRun == -1: prevRun = run
-
                             # Send deathlink
-                            if prevRun < run:
-                                prevRun = run
+                            if deathLinkTime < math.floor(time.time()):
                                 await self.context.send_death(random.choice(deathMsgs))
 
                         except (FileNotFoundError, json.decoder.JSONDecodeError) as e:
@@ -222,7 +218,7 @@ class CrimDawnContext(CommonContext):
                 count = 0
 
                 itemTypeLookup = {
-                    0: "Boring.",
+                    0: "Boring...",
                     1: "This seems important!",
                     2: "This seems useful!",
                     3: "This seems very important!",
@@ -440,7 +436,7 @@ class CrimDawnContext(CommonContext):
             asyncio.create_task(self.resetDeathLinkFlag())
 
     async def resetDeathLinkFlag(self):
-        await asyncio.sleep(3)
+        await asyncio.sleep(15)
         self.deathLinkPending = False
 
     def make_gui(self):
