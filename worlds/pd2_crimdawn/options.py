@@ -143,11 +143,23 @@ presets = {
         "safehouse_tiers": 4,
         "score_checks": 68,
     },
+    "4 Heists Turbo (~? hours)": {
+        "goal": 1,
+        "run_length": 4,
+        "safehouse_tiers": 2,
+        "score_checks": 54,
+    },
     "6 Heists (~8 hours)": {
         "goal": 1,
         "run_length": 6,
         "safehouse_tiers": 6,
         "score_checks": 72,
+    },
+    "6 Heists Turbo (~? hours)": {
+        "goal": 1,
+        "run_length": 6,
+        "safehouse_tiers": 3,
+        "score_checks": 66,
     },
     "3240 Points (~? hours)": {
         "goal": 3,
