@@ -9,7 +9,7 @@ import Utils, asyncio, colorama, logging, json, os, shutil, math, time, random
 from . import CrimDawnWorld, items
 from .data_structs import safeHouseData
 from collections.abc import Sequence
-from .locations import LOCATION_NAME_TO_ID, triangle, safehouseRooms
+from .locations import LOCATION_NAME_TO_ID, triangle, safehouseRooms, maxScoreLocations
 
 from BaseClasses import ItemClassification as IC
 from NetUtils import ClientStatus
@@ -106,6 +106,8 @@ class scrungle:
                             if score > prevScore:
                                 await self.context.score_check(score)
                                 prevScore = score
+                                if self.context.goal == "Score" and score == triangle(self.context.scoreChecks):
+                                    await self.context.send_msgs([{"cmd": "StatusUpdate", "status": ClientStatus.CLIENT_GOAL}])
 
                             if prevHeistsWon < heistsWon:
                                 prevHeistsWon = heistsWon
