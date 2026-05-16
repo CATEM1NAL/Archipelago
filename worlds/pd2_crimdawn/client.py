@@ -127,7 +127,7 @@ class scrungle:
                                     await self.context.send_msgs([{"cmd": "StatusUpdate", "status": ClientStatus.CLIENT_GOAL}])
 
                             # Send deathlink
-                            if deathLinkTime < math.floor(time.time()):
+                            if deathLinkTime > math.floor(time.time()):
                                 await self.context.send_death(random.choice(deathMsgs))
 
                         except (FileNotFoundError, json.decoder.JSONDecodeError) as e:
