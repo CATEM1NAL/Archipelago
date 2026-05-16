@@ -40,6 +40,12 @@ class CrimDawnCommandProcessor(ClientCommandProcessor):
                         f"Next check at {nextScoreCheck} points ({nextScoreCheck - self.ctx.score} more).\n"
                         f"Sent {100 * (self.ctx.score / triangle(self.ctx.scoreChecks)):.2f}% of total score checks.")
 
+    def _cmd_deathlink(self):
+        """Turn Deathlink off and on."""
+        if isinstance(self.ctx, CrimDawnContext):
+            self.ctx.deathLinkEnabled = not self.ctx.deathLinkEnabled
+            logger.info(f"Deathlink is now set to {self.ctx.deathLinkEnabled}")
+
 # scribble likes to write
 class scribble:
     def __init__(self, path):
