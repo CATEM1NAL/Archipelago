@@ -161,7 +161,7 @@ presets = {
         "safehouse_tiers": 3,
         "score_checks": 66,
     },
-    "3240 Points (~X hours)": {
+    "3240 Points (~3 hours)": {
         "goal": 3,
         "safehouse_tiers": 2,
         "score_checks": 64,
