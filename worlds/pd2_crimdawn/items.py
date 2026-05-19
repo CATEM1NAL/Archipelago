@@ -34,10 +34,10 @@ fillerItemDict: dict[int, itemData] = {
 }
 
 fillerLimitDict: dict[int, int] = {
-    300: 20,
-    301: 44,
-    302: 31,
-    303: 19,
+    300: 20, # Primary
+    301: 44, # Akimbo
+    302: 32, # Secondary
+    303: 21, # Melee
     304: 0,
 }
 
