@@ -137,7 +137,7 @@ class CrimDawnOptions(PerGameCommonOptions):
     biglobby: BotCount
 
 presets = {
-    "4 Heists (~X hours)": {
+    "4 Heists (~5 hours)": {
         "goal": 1,
         "run_length": 4,
         "safehouse_tiers": 4,
@@ -155,7 +155,7 @@ presets = {
         "safehouse_tiers": 6,
         "score_checks": 72,
     },
-    "6 Heists Turbo (~X hours)": {
+    "6 Heists Turbo (~4 hours)": {
         "goal": 1,
         "run_length": 6,
         "safehouse_tiers": 3,
