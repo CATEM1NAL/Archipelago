@@ -79,19 +79,24 @@ class scrungle:
         lastChatTime = math.floor(time.time())
         lastModTime = 0
         slotName = self.context.player_names[self.context.slot]
+
         funnyWeapons = ["HRL-7", "Heavy Crossbow", "SG Versteckt 51D Light Machine Gun", "Two Handed Great Ruler",
                         "Cash Blaster", "Inspector Gadget Character Pack", "backing of an entire nation state"]
-        deathMsgs = [f"{slotName} left their favourite cassette in the escape car.",
-                     f"{slotName} needs to get their head examined.",
-                     f"{slotName} learned that crime doesn't pay.",
-                     f"{slotName} watched dawn turn to dusk.",
-                     f"{slotName} doesn't have a razor mind.",
-                     f"{slotName} got caught up in that Kataru business.",
-                     f"The escape van left {slotName} behind.",
-                     f"{slotName} was consumed by DLC.",
-                     f"Scrungle found {slotName}. Nobody escapes Scrungle.",
-                     f"It's not {slotName}'s fault, they just had a bad build.",
-                     f"If {slotName} had the {random.choice(funnyWeapons)}, that wouldn't have happened."]
+        deathMsgs = [f"{slotName} left their favourite cassette in the escape car.", # 'Drifting' from the OST
+                     f"{slotName} needs to get their head examined.", # Crime Boss
+                     f"{slotName} learned that crime doesn't pay.", # yea
+                     f"{slotName} watched dawn turn to dusk.", # Look at the name of the mod
+                     f"{slotName} doesn't have a razor mind.", # I don't need to explain this one
+                     f"{slotName} got caught up in that Kataru business.", # Don't remember the origin of this line
+                     f"The escape van left {slotName} behind.", # No specific reference
+                     f"{slotName} was consumed by DLC.", # Bo Andersson in The Quest For Never-Ending Wealth
+                     f"Scrungle found {slotName}. Nobody escapes Scrungle.", # scrungle
+                     f"It's not {slotName}'s fault, they just had a bad build.", # I swear
+                     f"If {slotName} had the {random.choice(funnyWeapons)}, that wouldn't have happened.",
+                     f"{slotName} did that on purpose.", # We do a little bit of trolling
+                     f"{slotName} tried installing Linux.", # Inspired by real events
+                     f"All of D.C.'s forces and Commissioner Garrett's men worked together to send {slotName} to the menu again.", # Humpty Dumpty
+                     f"{slotName} doesn't remember how to play that heist."] # A surprisingly common occurrence
 
         print(f"Scrungle is watching {self.path}...")
 
@@ -349,9 +354,7 @@ class CrimDawnContext(CommonContext):
         self.maxProgressionItems = args['slot_data']['progression_items']
         self.campaign = args['slot_data']["campaign"]
         self.safehouseTiers = args['slot_data']["safehouse_tiers"]
-        self.deathLinkEnabled = args['slot_data']["death_link"]
 
-        self.scribble.writeVariable("deathlink_state", self.deathLinkEnabled)
         self.scribble.writeVariable("goal", self.goal)
         self.scribble.writeVariable("run_length", self.runLength)
         self.scribble.writeVariable("max_progression_items", self.maxProgressionItems)
@@ -361,8 +364,7 @@ class CrimDawnContext(CommonContext):
         self.scribble.writeVariable("score_checks", self.scoreChecks)
         self.scribble.writeVariable("infinite_time", args['slot_data']['infinite_time'])
 
-        if self.deathLinkEnabled:
-            asyncio.create_task(self.update_death_link(True))
+        asyncio.create_task(self.update_death_link(True))
 
         keys = list(self.safehouseIdToName)
         self.safehouseRooms = []
@@ -438,10 +440,9 @@ class CrimDawnContext(CommonContext):
     async def send_death(self, death_text: str = ""):
         if self.deathLinkPending:
             return
-        if self.deathLinkEnabled:
-            self.deathLinkPending = True
-            asyncio.create_task(super().send_death(death_text))
-            asyncio.create_task(self.resetDeathLinkFlag())
+        self.deathLinkPending = True
+        asyncio.create_task(super().send_death(death_text))
+        asyncio.create_task(self.resetDeathLinkFlag())
 
     async def resetDeathLinkFlag(self):
         await asyncio.sleep(15)
