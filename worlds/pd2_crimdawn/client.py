@@ -40,12 +40,6 @@ class CrimDawnCommandProcessor(ClientCommandProcessor):
                         f"Next check at {nextScoreCheck} points ({nextScoreCheck - self.ctx.score} more).\n"
                         f"Sent {100 * (self.ctx.score / triangle(self.ctx.scoreChecks)):.2f}% of total score checks.")
 
-    def _cmd_deathlink(self):
-        """Turn Deathlink off and on."""
-        if isinstance(self.ctx, CrimDawnContext):
-            self.ctx.deathLinkEnabled = not self.ctx.deathLinkEnabled
-            logger.info(f"Deathlink is now set to {self.ctx.deathLinkEnabled}")
-
 # scribble likes to write
 class scribble:
     def __init__(self, path):
@@ -111,7 +105,7 @@ class scrungle:
                         try:
                             modSave = load_json_file(self.path)
                             score = modSave["game"]["score"]
-                            deathLinkTime = modSave["game"]["deathlink_time"]
+                            deathLinkTime = modSave["game"]["deathlink_out"]
                             heistsWon = modSave["game"]["heists_won"]
 
                             if score > prevScore:
@@ -132,7 +126,7 @@ class scrungle:
                                     await self.context.send_msgs([{"cmd": "StatusUpdate", "status": ClientStatus.CLIENT_GOAL}])
 
                             # Send deathlink
-                            if deathLinkTime > math.floor(time.time()):
+                            if deathLinkTime >= math.floor(time.time()):
                                 await self.context.send_death(random.choice(deathMsgs))
 
                         except (FileNotFoundError, json.decoder.JSONDecodeError) as e:
@@ -169,7 +163,7 @@ class scrungle:
 
 class CrimDawnContext(CommonContext):
     game = "PAYDAY 2: Criminal Dawn"
-    tags = {"AP"}
+    tags = {"AP", "DeathLink"}
     command_processor = CrimDawnCommandProcessor
     items_handling = 0b111
 
@@ -364,8 +358,6 @@ class CrimDawnContext(CommonContext):
         self.scribble.writeVariable("score_checks", self.scoreChecks)
         self.scribble.writeVariable("infinite_time", args['slot_data']['infinite_time'])
 
-        asyncio.create_task(self.update_death_link(True))
-
         keys = list(self.safehouseIdToName)
         self.safehouseRooms = []
 
@@ -433,7 +425,7 @@ class CrimDawnContext(CommonContext):
     def on_deathlink(self, data: dict):
         if self.deathLinkPending:
             return
-        self.scribble.writeVariable("deathlink_time", math.floor(time.time()))
+        self.scribble.writeVariable("deathlink_in", math.floor(time.time()))
         super().on_deathlink(data)
         asyncio.create_task(self.resetDeathLinkFlag())
 
