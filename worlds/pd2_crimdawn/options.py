@@ -2,13 +2,6 @@ from dataclasses import dataclass
 
 from Options import Choice, TextChoice, PerGameCommonOptions, Range, Toggle, OptionGroup, DefaultOnToggle
 
-class InfiniteTime(DefaultOnToggle):
-    """
-    Whether the timer is disabled after obtaining all progression items.
-    """
-
-    display_name = "Infinite Time"
-
 class Goal(Choice):
     """
     ORIGINAL: Finish a run consisting of random tiered heists.
@@ -115,15 +108,6 @@ class BotCount(Toggle):
 
     display_name = "BigLobby"
 
-class DeathLink(Toggle):
-    """
-    Death links are sent when a heist is failed.
-    After receiving a death link you will lose a down the next time you take damage.
-    In a multiplayer session only the lobby host can send death links to prevent spam.
-    """
-
-    display_name = "Death Link"
-
 @dataclass
 class CrimDawnOptions(PerGameCommonOptions):
     goal: Goal
@@ -131,8 +115,6 @@ class CrimDawnOptions(PerGameCommonOptions):
     run_length: RunLength
     score_checks: ScoreChecks
     safehouse_tiers: SafehouseTiers
-    infinite_time: InfiniteTime
-    death_link: DeathLink
     early_bot: EarlyBot
     biglobby: BotCount
 
