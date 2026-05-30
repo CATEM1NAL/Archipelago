@@ -24,14 +24,17 @@ class Campaign(Choice):
 
     CLASSICS: First World Bank, Heat Street, Panic Room, Green Bridge, Diamond Heist, Slaughterhouse.
     YOU GUYS NO FUN: Four Stores, Mallcrasher, Nightclub, Aftershock, Meltdown.
-    RETURN OF THE RAT: Watchdogs, Firestarter Day 1, Rats, Hoxton Breakout Day 2, Hoxton Revenge.
+    RETURN OF THE RAT: Watchdogs, Firestarter day 1, Rats, Hoxton Breakout day 2, Hoxton Revenge.
+    DEATH OF DEMOCRACY: Framing Frame day 3, Election Day bank, Big Oil day 2.
     MURKY DAY: Shadow Raid, Meltdown, Beneath the Mountain (DLC), Henry's Rock.
-    I NEED MY PAYDAY TOO: Big Bank (DLC), The Diamond (DLC), Hotline Miami (DLC), Hoxton Breakout Day 1, Golden Grin Casino (DLC).
+    I NEED MY PAYDAY TOO: Big Bank (DLC), The Diamond (DLC), Hotline Miami (DLC), Hoxton Breakout day 1, Golden Grin Casino (DLC).
     GREATEST HEIST OF ALL: Reservoir Dogs (DLC), Brooklyn Bank, Shacklethorne Auction, Breakin' Feds, Hell's Island, White House.
     SILK ROAD: Border Crossing (DLC), San Martín Bank (DLC), Breakfast in Tijuana (DLC), Buluc's Mansion (DLC).
     CITY OF GOLD: Dragon Heist (DLC), Black Cat (DLC), Mountain Master (DLC).
     TEXAS HEAT: Midland Ranch (DLC), Hostile Takeover (DLC), Crude Awakening (DLC).
     FOLLOW THE MONEY: Bank Heist: Cash, GO Bank, Brooklyn Bank, San Martín Bank (DLC), First World Bank, Big Bank (DLC).
+    GUN RUNNERS: Firestarter day 1, Aftershock, Brooklyn 10-10 (DLC), Bomb: Dockyard (DLC), Midland Ranch (DLC), Border Crossing (DLC).
+    STEALTH MISSION: Breakin' Feds, Yacht Heist (DLC), Murky Station (licensed), Shadow Raid, Car Shop.
     """
 
     display_name = "Campaign"
@@ -39,13 +42,16 @@ class Campaign(Choice):
     option_classics = 1
     option_you_guys_no_fun = 2
     option_return_of_the_rat = 3
-    option_murky_day = 4
-    option_i_need_my_payday_too = 5
-    option_greatest_heist_of_all = 6
-    option_silk_road = 7
-    option_city_of_gold = 8
-    option_texas_heat = 9
-    option_follow_the_money = 10
+    option_death_of_democracy = 4
+    option_murky_day = 5
+    option_i_need_my_payday_too = 6
+    option_greatest_heist_of_all = 7
+    option_silk_road = 8
+    option_city_of_gold = 9
+    option_texas_heat = 10
+    option_follow_the_money = 11
+    option_gun_runners = 12
+    option_stealth_mission = 100
 
     default = option_classics
 

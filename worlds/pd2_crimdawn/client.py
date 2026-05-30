@@ -356,7 +356,6 @@ class CrimDawnContext(CommonContext):
         self.scribble.writeVariable("campaign", self.campaign)
         self.scribble.writeVariable("safehouse_tiers", self.safehouseTiers)
         self.scribble.writeVariable("score_checks", self.scoreChecks)
-        self.scribble.writeVariable("infinite_time", args['slot_data']['infinite_time'])
 
         keys = list(self.safehouseIdToName)
         self.safehouseRooms = []

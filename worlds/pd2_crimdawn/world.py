@@ -58,7 +58,10 @@ class CrimDawnWorld(World):
                 "Holiday Special": 3,
                 "Classics": 6,
                 "You Guys No Fun": 5,
-                "Follow The Money": 6
+                "Follow The Money": 6,
+                "Death Of Democracy": 3,
+                "Gun Runners": 6,
+                "Stealth Mission": 5
             }
             self.goal = self.options.goal.get_option_name(self.options.goal.value)
             self.isCampaign = self.goal == "Campaign"
