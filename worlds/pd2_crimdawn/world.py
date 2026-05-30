@@ -152,7 +152,5 @@ class CrimDawnWorld(World):
         args["campaign"] = self.isCampaign
         args["safehouse_tiers"] = self.safehouseTiers
         args["bot_count"] = self.botCount
-        args["infinite_time"] = bool(self.options.infinite_time)
-        args["death_link"] = bool(self.options.death_link)
 
         return args
