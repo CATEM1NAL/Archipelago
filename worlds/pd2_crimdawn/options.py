@@ -137,13 +137,13 @@ presets = {
         "safehouse_tiers": 2,
         "score_checks": 54,
     },
-    "6 Heists (~8 hours)": {
+    "6 Heists (~6 hours)": {
         "goal": 1,
         "run_length": 6,
         "safehouse_tiers": 6,
         "score_checks": 72,
     },
-    "6 Heists Turbo (~4 hours)": {
+    "6 Heists Turbo (~5 hours)": {
         "goal": 1,
         "run_length": 6,
         "safehouse_tiers": 3,
